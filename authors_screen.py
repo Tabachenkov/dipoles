@@ -15,13 +15,13 @@ class AuthorsScreen():
         self.big_font = pygame.font.SysFont(self.font, int(50  * self.app.scale))
         self.strings = ["Московский Государственный Университет им. М.В. Ломоносова",
                         "Факультет вычислительной математики и кибернетики", 
-                        "Лектор: Андреев Анатолий Васильевич",
+                        "Лектор: Григорьев Кирилл Сергеевич",
                         "Руководитель: Чичигина Ольга Александровна",
                         "Табаченков Андрей",
                         "Цыбанов Илья"]
         self.eng_strings = ["Lomonosov Moscow State University",
                             "Faculty of Computational Mathematics and Cybernetics",
-                            "Lecturer: Andreev Anatoly Vasilyevich",
+                            "Lecturer: Grigoriev Kirill Sergeevich",
                             "Head: Olga Alexandrovna Chichigina",
                             "Tabachenkow Andrei",
                             "Tsybanov Ilya"]
@@ -44,12 +44,12 @@ class AuthorsScreen():
                                    (180 * self.app.scale, 80 * self.app.scale), 
                                    (340 * self.app.scale, 300 * self.app.scale), 
                                    (1160 * self.app.scale, 300 * self.app.scale)]
-        self.buttons = [Button(app, "Назад", (1300, 900), (300, 80)), Button(app, "RUS/ENG", (1710, 980), (170, 70), font_size=30)]
+        self.buttons = [Button(app, "Назад", (1300, 900), (300, 80)), Button(app, "RUS/ENG", (1710, 900), (170, 70), font_size=30)]
     
     def _update_screen(self):
         self.screen.fill(self.bg_color)
         self.strings_surfaces = []
-        self.buttons = [Button(self.app, "Назад" if self.app.russian else "Back", (1300, 900), (300, 80)), Button(self.app, "RUS/ENG", (1710, 980), (170, 70), font_size=30)]
+        self.buttons = [Button(self.app, "Назад" if self.app.russian else "Back", (1300, 900), (300, 80)), Button(self.app, "RUS/ENG", (1710, 900), (170, 70), font_size=30)]
         for index, string in enumerate(self.strings if self.app.russian else self.eng_strings):
             if index < 2:
                 self.strings_surfaces.append(self.middle_font.render(string, False, (0, 0, 0)))
@@ -80,5 +80,4 @@ class AuthorsScreen():
                     self.app.active_screen = self.app.menu_screen
                 if index == 1:
                     self.app.russian = not self.app.russian
-                    #self.app.menu_screen = MenuScreen(self.app)
                     self.app.demo_screen = DemoScreen(self.app)

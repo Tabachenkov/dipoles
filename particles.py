@@ -17,7 +17,6 @@ class ParticleSystem:
     d_radius: float
     r: float
     ITERATION: int = 0
-    #dipoles
 
     def __post_init__(self) -> None:
         x_space = np.linspace(self.radius, self.max_width - self.radius, int(self.max_width // (2.5 * self.radius)))
@@ -224,4 +223,7 @@ class ParticleSystem:
             else:
                 self.dipoles[pair[1] // 2].w -= dt * proj / (3 * self.r)
         
-        return True
+        def get_kinetic(dipole):
+            return 2 * np.sum(dipole.c_vel ** 2) + dipole.w ** 2
+        
+        return [get_kinetic(self.dipoles[i]) for i in range(2)]

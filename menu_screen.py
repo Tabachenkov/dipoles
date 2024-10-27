@@ -20,21 +20,21 @@ class MenuScreen():
         self.demonstration_label = "Компьютерная демонстрация по курсу"
         self.subject_name = "Статистическая физика"
         self.demonstration_name = "Взаимодействие диполей"
-        self.demonstration_name_2 = "уравнение Вандер-Вальса"
+        self.demonstration_name_2 = ""
         self.strings = [self.msu_name, self.faculty_name, self.demonstration_label, self.subject_name,
                         self.demonstration_name, self.demonstration_name_2]
         self.eng_strings = ["Lomonosov Moscow State University", "Faculty of Computational Mathematics and Cybernetics",
                             "Computer demonstration of the course", "Statistical physics", "Dipoles' interaction",
-                            "Vander-Vals equation"]
-        self.positions = [(400, 100), (500, 150), (700, 250), (800, 300), (550, 400), (670, 470)]
-        self.eng_positions = [(650, 100), (500, 150), (700, 250), (830, 300), (630, 400), (720, 470)]
+                            ""]
+        self.positions = [(400, 100), (500, 150), (700, 250), (800, 300), (650, 400), (670, 470)]
+        self.eng_positions = [(650, 100), (500, 150), (700, 250), (830, 300), (730, 400), (720, 470)]
         self.cmc_logo = pygame.transform.scale(pygame.image.load("cmc_logo.jpg"), np.array((140, 140)) * self.scale)
         self.msu_logo = pygame.transform.scale(pygame.image.load("msu_logo.jpg"), np.array((150, 150)) * self.scale)
         self.buttons = [Button(app, "Демонстрация", (750, 600), (400, 80)), 
                         Button(app, "Теория", (750, 700), (400, 80)),
                         Button(app, "Авторы", (750, 800), (400, 80)), 
                          Button(app, "Выход", (750, 900), (400, 80)),
-                         Button(app, "RUS/ENG", (1710, 980), (170, 70), font_size=30)]
+                         Button(app, "RUS/ENG", (1710, 900), (170, 70), font_size=30)]
         self.russian = True
 
     def _update_screen(self):
@@ -42,7 +42,7 @@ class MenuScreen():
                         Button(self.app, "Теория" if self.app.russian else "Theory", (750, 700), (400, 80)),
                         Button(self.app, "Авторы" if self.app.russian else "Authors", (750, 800), (400, 80)), 
                          Button(self.app, "Выход" if self.app.russian else "Exit", (750, 900), (400, 80)),
-                         Button(self.app, "RUS/ENG", (1710, 980), (170, 70), font_size=30)]
+                         Button(self.app, "RUS/ENG", (1710, 900), (170, 70), font_size=30)]
         self.screen.fill(self.bg_color)
         self.strings_surfaces = []
         for index, string in enumerate(self.strings if self.app.russian else self.eng_strings):
@@ -73,8 +73,9 @@ class MenuScreen():
                 if index == 0:
                     self.app.active_screen = self.app.demo_screen
                 elif index == 1:
-                    self.app.active_screen = self.app.theory_screen
-                if index == 2:
+                    #self.app.active_screen = self.app.theory_screen
+                    continue 
+                elif index == 2:
                     self.app.active_screen = self.app.authors_screen
                 elif index == 3:
                     sys.exit()

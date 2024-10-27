@@ -10,6 +10,9 @@ numpy = "*"
 pgwidget = "*"
 pygame-menu = "*"
 pygame-widgets = "*"
+pygame-plot = "*"
+matplotlib = "*"
+pygame-matplotlib = "*"
 
 [dev-packages]
 

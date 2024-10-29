@@ -7,6 +7,9 @@ import math
 
 EPS = 1e-20
 
+def get_kinetic(dipole):
+    return 2 * np.sum(dipole.c_vel ** 2) + dipole.w ** 2
+
 @dataclass
 class ParticleSystem:
     count: int
@@ -62,6 +65,8 @@ class ParticleSystem:
             if dist[0] < 0:
                 actangle += math.pi
             self.dipoles[i] = Dipole(pos, actangle)
+
+        self.max_kin = 8e6 * 2
     
     def get_average_speed(self) -> float:
         if self.count == 0:
@@ -82,6 +87,9 @@ class ParticleSystem:
             return
         self.entities[:, 2] *= (value / average_speed)
         self.entities[:, 3] *= (value / average_speed)
+
+    def get_full_kinetic(self):
+        return sum([get_kinetic(self.dipoles[i]) for i in range(2)])
     
     def proceed(self, dt: float):
         if self.count > 0:
@@ -163,9 +171,9 @@ class ParticleSystem:
                     proj = np.sum(np.array([-sin, cos]) * delta_v)
                     self.dipoles[i // 2].c_vel += delta_v / 2
                     if i % 2 == 0:
-                        self.dipoles[i // 2].w += proj / (3 * self.r)
+                        self.dipoles[i // 2].w += proj / (3 * (self.r + 1))
                     else:
-                        self.dipoles[i // 2].w -= proj / (3 * self.r)
+                        self.dipoles[i // 2].w -= proj / (3 * (self.r + 1))
 
             for i in range(self.count):
                 arr = self.entities[i+1:]
@@ -204,26 +212,32 @@ class ParticleSystem:
                 pos1 = self.dipoles[pair[1] // 2].pos - self.r * np.array([math.cos(self.dipoles[pair[1] // 2].actangle), math.sin(self.dipoles[pair[1] // 2].actangle)])
             r = pos0 - pos1
             r_size = np.sqrt(r[0] ** 2 + r[1] ** 2).item()
+            '''
             if r_size < self.radius + self.d_radius:
                 return False
-            f_kulon = 9e7 * q1q2 * r / (r_size) ** 3
+            '''
+            f_kulon = 9e9 * q1q2 * r / (r_size + self.d_radius) ** 3
             # if self.ITERATION < 20:
             #    print(dt * f_kulon, self.dipoles[pair[0] // 2].c_vel + dt * f_kulon)
             self.dipoles[pair[0] // 2].c_vel = self.dipoles[pair[0] // 2].c_vel + dt * f_kulon
             proj = np.sum(f_kulon * np.array([-math.sin(self.dipoles[pair[0] // 2].actangle), math.cos(self.dipoles[pair[0] // 2].actangle)]))
             if pair[0] % 2 == 0:
-                self.dipoles[pair[0] // 2].w += dt * proj / (3 * self.r)
+                self.dipoles[pair[0] // 2].w += dt * proj / (3 * (self.r + 1))
             else:
-                self.dipoles[pair[0] // 2].w -= dt * proj / (3 * self.r)
+                self.dipoles[pair[0] // 2].w -= dt * proj / (3 * (self.r + 1))
             f_kulon *= -1
             self.dipoles[pair[1] // 2].c_vel = self.dipoles[pair[1] // 2].c_vel + dt * f_kulon
             proj = np.sum(f_kulon * np.array([-math.sin(self.dipoles[pair[1] // 2].actangle), math.cos(self.dipoles[pair[1] // 2].actangle)]))
             if pair[1] % 2 == 0:
-                self.dipoles[pair[1] // 2].w += dt * proj / (3 * self.r)
+                self.dipoles[pair[1] // 2].w += dt * proj / (3 * (self.r + 1))
             else:
-                self.dipoles[pair[1] // 2].w -= dt * proj / (3 * self.r)
-        
-        def get_kinetic(dipole):
-            return 2 * np.sum(dipole.c_vel ** 2) + dipole.w ** 2
+                self.dipoles[pair[1] // 2].w -= dt * proj / (3 * (self.r + 1))
+
+        cur_kin = self.get_full_kinetic() 
+        if cur_kin > self.max_kin:
+            coef = math.sqrt(cur_kin / self.max_kin)
+            for i in range(2):
+                self.dipoles[i].c_vel /= coef
+                self.dipoles[i].w /= coef
         
         return [get_kinetic(self.dipoles[i]) for i in range(2)]

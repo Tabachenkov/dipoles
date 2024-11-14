@@ -41,40 +41,60 @@ class DemoScreen():
         self.height = 500
         self.d_radius = 5.0
         self.r = 15.0
+        self.charge = 1
+        self.charge_mass = 1
+        self.m = 1
 
         pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width, self.height), 0)
         pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width, self.height), 1)
 
         self.mode = NOT_STARTED
-        self.slider = Slider(self.screen, x=1600, y=100, width=250, height=10, min=0, max=2000, initial=0, step=1)
-        self.textbox = TextBox(self.screen, 1710, 120, 40, 20, fontSize=10)
+        self.slider = Slider(self.screen, x=1600, y=50, width=250, height=10, min=0, max=2000, initial=0, step=1)
+        self.textbox = TextBox(self.screen, 1710, 70, 40, 20, fontSize=10)
         self.particles_number = 1000
         self.speed = 500
-        self.slider_s = Slider(self.screen, x=1600, y=200, width=250, height=10, min=1, max=1000, initial=500, step=1)
-        self.textbox_s = TextBox(self.screen, 1710, 220, 40, 20, fontSize=10)
-        self.slider_dt = Slider(self.screen, x=1600, y=300, width=250, height=10, min=0.005, max=0.1, initial=0.01, step=0.005)
-        self.textbox_dt = TextBox(self.screen, 1710, 320, 40, 20, fontSize=10)
-        self.slider_radius = Slider(self.screen, x=1600, y=400, width=250, height=10, min=1, max=10, initial=1, step=1)
-        self.textbox_radius = TextBox(self.screen, 1710, 420, 40, 20, fontSize=10)
-        self.slider_width = Slider(self.screen, x=1600, y=500, width=250, height=10, min=100, max=1500, initial=1500, step=100)
-        self.textbox_width = TextBox(self.screen, 1710, 520, 40, 20, fontSize=10)
-        self.slider_height = Slider(self.screen, x=1600, y=600, width=250, height=10, min=100, max=500, initial=500, step=100)
-        self.textbox_height = TextBox(self.screen, 1710, 620, 40, 20, fontSize=10)
-        self.slider_d_radius = Slider(self.screen, x=1600, y=700, width=250, height=10, min=1, max=15, initial=5, step=1)
-        self.textbox_d_radius = TextBox(self.screen, 1710, 720, 40, 20, fontSize=10)
-        self.slider_r = Slider(self.screen, x=1600, y=800, width=250, height=10, min=15, max=100, initial=15, step=1)
-        self.textbox_r = TextBox(self.screen, 1710, 820, 40, 20, fontSize=10)
+        self.slider_s = Slider(self.screen, x=1600, y=150, width=250, height=10, min=1, max=1000, initial=500, step=1)
+        self.textbox_s = TextBox(self.screen, 1710, 170, 40, 20, fontSize=10)
+        self.slider_dt = Slider(self.screen, x=1600, y=250, width=250, height=10, min=0.005, max=0.1, initial=0.01, step=0.005)
+        self.textbox_dt = TextBox(self.screen, 1710, 270, 40, 20, fontSize=10)
+        self.slider_radius = Slider(self.screen, x=1600, y=350, width=250, height=10, min=1, max=10, initial=1, step=1)
+        self.textbox_radius = TextBox(self.screen, 1710, 370, 40, 20, fontSize=10)
+        self.slider_width = Slider(self.screen, x=1600, y=450, width=250, height=10, min=100, max=1500, initial=1500, step=100)
+        self.textbox_width = TextBox(self.screen, 1710, 470, 40, 20, fontSize=10)
+        self.slider_height = Slider(self.screen, x=1600, y=550, width=250, height=10, min=100, max=500, initial=500, step=100)
+        self.textbox_height = TextBox(self.screen, 1710, 570, 40, 20, fontSize=10)
+        self.slider_d_radius = Slider(self.screen, x=1600, y=650, width=250, height=10, min=1, max=15, initial=5, step=1)
+        self.textbox_d_radius = TextBox(self.screen, 1710, 670, 40, 20, fontSize=10)
+        self.slider_r = Slider(self.screen, x=1600, y=750, width=250, height=10, min=15, max=100, initial=15, step=1)
+        self.textbox_r = TextBox(self.screen, 1710, 770, 40, 20, fontSize=10)
+        self.slider_charge = Slider(self.screen, x=1600, y=850, width=250, height=10, min=1, max=10, initial=1, step=1)
+        self.textbox_charge = TextBox(self.screen, 1710, 870, 40, 20, fontSize=10)
+        self.slider_charge_mass = Slider(self.screen, x=1600, y=950, width=250, height=10, min=1, max=50, initial=1, step=1)
+        self.textbox_charge_mass = TextBox(self.screen, 1710, 970, 40, 20, fontSize=10)
+        self.slider_m = Slider(self.screen, x=1000, y=600, width=250, height=10, min=1, max=50, initial=1, step=1)
+        self.textbox_m = TextBox(self.screen, 1000, 620, 40, 20, fontSize=10)
 
-        self.strings = ["Количество частиц", "Средняя скорость частиц", "Шаг вычислений, сек.", 
-        "Радиус частицы", "Ширина", "Высота", "Радиус заряда", "Расстояние между диполями", "Средняя кин. энергия 1 диполя: 0", "Стандартное отклонение кин. энергии 1 диполя",
+        self.strings = ["Количество частиц", "Средняя скорость частиц", "dt, сек.", 
+        "Радиус частицы", "Ширина", "Высота", "Радиус заряда", "Расстояние между зарядами", "Величина заряда",
+        "Масса заряда", "Масса частицы",
+        "Средняя кин. энергия 1 диполя: 0", "Стандартное отклонение кин. энергии 1 диполя",
         "Средняя кин. энергия 2 диполя: 0", "Стандартное отклонение кин. энергии 2 диполя"]
-        self.eng_strings = ["Number of particles", "Average speed of particles", "Calculations step, sec.", 
-        "Particle radius", "Width", "Height", "Charge radius", "Distance between dipoles", "Average kin. energy of 1 dipole: 0", "Standard dev. of 1 dipole: 0",
+        self.eng_strings = ["Number of particles", "Average speed of particles", "dt, sec.", 
+        "Particle radius", "Width", "Height", "Charge radius", "Distance between charges", "Charge value",
+        "Charge mass", "Particle mass",
+        "Average kin. energy of 1 dipole: 0", "Standard dev. of 1 dipole: 0",
         "Average kin. energy of 2 dipole: 0", "Standard dev. of 2 dipole: 0"]
-        self.positions = [(1620, 70), (1600, 170), (1600, 270), (1600, 370), (1600, 470), (1600, 570), (1600, 670), (1600, 770), (1000, 600), (1000, 650), (1000, 700), (1000, 750)]
-        self.eng_positions = [(1620, 70), (1600, 170), (1600, 270), (1600, 370), (1600, 470), (1600, 570), (1600, 670), (1600, 770), (1000, 600), (1000, 650), (1000, 700), (1000, 750)]
+        self.positions = [(1620, 20), (1600, 120), (1600, 220), (1600, 320), (1600, 420), (1600, 520), (1600, 620), (1600, 720), (1600, 820), (1600, 920), 
+                          (1000, 570),  
+                          (1000, 660), (1000, 690), (1000, 720), (1000, 750)]
+        self.eng_positions = [(1620, 20), (1600, 120), (1600, 220), (1600, 320), (1600, 420), (1600, 520), (1600, 620), (1600, 720), (1600, 820), (1600, 920),
+                              (1000, 570),   
+                              (1000, 660), (1000, 690), (1000, 720), (1000, 750)]
 
         self.data = [[], []]
+
+        self.particle_system = ParticleSystem(self.particles_number, self.radius, max_width=self.width, max_height=self.height, 
+                                                          avg_vel=self.speed, d_radius=self.d_radius, r=self.r, charge=self.charge, charge_mass=self.charge_mass, m=1)
 
     def _check_events(self):
         events = pygame.event.get()
@@ -93,6 +113,9 @@ class DemoScreen():
         self.slider_height.listen(events)
         self.slider_d_radius.listen(events)
         self.slider_r.listen(events)
+        self.slider_charge.listen(events)
+        self.slider_charge_mass.listen(events)
+        self.slider_m.listen(events)
 
         self.textbox.listen(events)
         self.textbox_s.listen(events)
@@ -102,6 +125,9 @@ class DemoScreen():
         self.textbox_height.listen(events)
         self.textbox_d_radius.listen(events)
         self.textbox_r.listen(events)
+        self.textbox_charge.listen(events)
+        self.textbox_charge_mass.listen(events)
+        self.textbox_m.listen(events)
 
         self.textbox.setText(self.slider.getValue())
         self.textbox_s.setText(self.slider_s.getValue())
@@ -111,6 +137,9 @@ class DemoScreen():
         self.textbox_height.setText(self.slider_height.getValue())
         self.textbox_d_radius.setText(self.slider_d_radius.getValue())
         self.textbox_r.setText(self.slider_r.getValue())
+        self.textbox_charge.setText(self.slider_charge.getValue())
+        self.textbox_charge_mass.setText(self.slider_charge_mass.getValue())
+        self.textbox_m.setText(self.slider_m.getValue())
 
         self.particles_number = self.slider.getValue()
         self.speed = self.slider_s.getValue()
@@ -120,6 +149,13 @@ class DemoScreen():
         self.height = self.slider_height.getValue()
         self.d_radius = self.slider_d_radius.getValue()
         self.r = self.slider_r.getValue()
+        self.charge = self.slider_charge.getValue()
+        self.charge_mass = self.slider_charge_mass.getValue()
+        self.m = self.slider_m.getValue()
+
+        self.particle_system.charge = self.charge
+        self.particle_system.charge_mass = self.charge_mass
+        self.particle_system.m = self.m
 
     def _update_screen(self):
         self.screen.fill(self.bg_color)
@@ -287,6 +323,12 @@ class DemoScreen():
         self.textbox_height.draw()
         self.textbox_d_radius.draw()
         self.textbox_r.draw()
+        self.slider_charge.draw()
+        self.textbox_charge.draw()
+        self.slider_charge_mass.draw()
+        self.textbox_charge_mass.draw()
+        self.slider_m.draw()
+        self.textbox_m.draw()
 
     def _check_buttons(self, mouse_position):
         for index, button in enumerate(self.buttons):
@@ -295,7 +337,8 @@ class DemoScreen():
                     self.app.active_screen = self.app.menu_screen
                 elif button.msg == 'Начать' or button.msg == 'Start':
                     self.mode = ACTIVATED
-                    self.particle_system = ParticleSystem(self.particles_number, self.radius, max_width=self.width, max_height=self.height, avg_vel=self.speed, d_radius=self.d_radius, r=self.r)
+                    self.particle_system = ParticleSystem(self.particles_number, self.radius, max_width=self.width, max_height=self.height, 
+                                                          avg_vel=self.speed, d_radius=self.d_radius, r=self.r, charge=self.charge, charge_mass=self.charge_mass, m=1)
                     self.data = [[], []]
                 elif button.msg == 'Остановить' or button.msg == 'Stop':
                     self.mode = PAUSED

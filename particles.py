@@ -7,8 +7,21 @@ import math
 
 EPS = 1e-20
 
-def get_kinetic(dipole):
-    return 2 * np.sum(dipole.c_vel ** 2) + dipole.w ** 2
+class DipoleState(Enum):
+    NORMAL = 1
+    STUCK = 2
+
+def get_kinetic(dipole, mass=1, d_radius=5, r=15):
+    return mass * np.sum(dipole.c_vel ** 2) + mass * ((4 * (d_radius ** 2) / 5) + ((r ** 2) / 2)) * (dipole.w ** 2)
+
+@dataclass
+class Dipole:
+    pos: np.ndarray
+    actangle: float
+    c_vel: np.ndarray = np.zeros(2)
+    w: float = 0.0
+    state: DipoleState = DipoleState.NORMAL
+    stuck_partner: 'Dipole' = None  # Партнер по "слипанию", если диполь слипающийся
 
 @dataclass
 class ParticleSystem:
@@ -19,6 +32,9 @@ class ParticleSystem:
     avg_vel: float
     d_radius: float
     r: float
+    charge: float
+    charge_mass: float
+    m: float
     ITERATION: int = 0
 
     def __post_init__(self) -> None:
@@ -66,12 +82,55 @@ class ParticleSystem:
                 actangle += math.pi
             self.dipoles[i] = Dipole(pos, actangle)
 
-        self.max_kin = 8e6 * 2
+        self.max_kin = self.charge_mass * np.sum(1500 ** 2) + self.charge_mass * ((4 * (self.d_radius ** 2) / 5) + ((self.r ** 2) / 2)) * (300 ** 2)
     
     def get_average_speed(self) -> float:
         if self.count == 0:
             return 0
         return np.sqrt(self.entities[:, 2] ** 2 + self.entities[:, 3] ** 2).mean()
+    
+    def update_dipole_pair(self):
+        # Рассчитываем текущее расстояние между двумя диполями
+        pairs = [(0, 2), (0, 3), (1, 2), (1, 3)]
+        r_sizes = []
+        for pair in pairs:
+            if pair[0] % 2 == 0:
+                pos0 = self.dipoles[pair[0] // 2].pos + self.r * np.array([math.cos(self.dipoles[pair[0] // 2].actangle), math.sin(self.dipoles[pair[0] // 2].actangle)])
+            else:
+                pos0 = self.dipoles[pair[0] // 2].pos - self.r * np.array([math.cos(self.dipoles[pair[0] // 2].actangle), math.sin(self.dipoles[pair[0] // 2].actangle)])
+            if pair[1] % 2 == 0:
+                pos1 = self.dipoles[pair[1] // 2].pos + self.r * np.array([math.cos(self.dipoles[pair[1] // 2].actangle), math.sin(self.dipoles[pair[1] // 2].actangle)])
+            else:
+                pos1 = self.dipoles[pair[1] // 2].pos - self.r * np.array([math.cos(self.dipoles[pair[1] // 2].actangle), math.sin(self.dipoles[pair[1] // 2].actangle)])
+            r = pos0 - pos1
+            r_size = np.sqrt(r[0] ** 2 + r[1] ** 2).item()
+            r_sizes.append(r_size)
+        distance = min(r_sizes)
+
+        # Условие для слипания: если диполи достаточно близко и оба в состоянии NORMAL
+        if distance < self.r and self.dipoles[0].state == DipoleState.NORMAL and self.dipoles[1].state == DipoleState.NORMAL:
+            # Переключаем оба диполя на состояние STUCK
+            self.dipoles[0].state = DipoleState.STUCK
+            self.dipoles[1].state = DipoleState.STUCK
+            self.dipoles[0].stuck_partner = self.dipoles[1]  # Устанавливаем партнера для слипания
+            self.dipoles[1].stuck_partner = self.dipoles[0]  # Взаимно устанавливаем партнера
+
+            # Вычисляем общую скорость и угловую скорость для движения как единого объекта
+            center_velocity = (self.dipoles[0].c_vel + self.dipoles[1].c_vel) / 2
+            self.dipoles[0].c_vel = center_velocity 
+            self.dipoles[1].c_vel = center_velocity  # Присваиваем общую скорость
+            angular_velocity = (self.dipoles[0].w + self.dipoles[1].w) / 2
+            self.dipoles[0].w = angular_velocity
+            self.dipoles[1].w = angular_velocity  # Присваиваем общую угловую скорость
+
+        # Условие для разлипания: если слипшиеся диполи разошлись дальше порога разлипания
+        elif self.dipoles[0].state == DipoleState.STUCK and self.dipoles[1].state == DipoleState.STUCK:
+            if distance > 1.5 * self.r:
+                # Переключаем оба диполя обратно на состояние NORMAL
+                self.dipoles[0].state = DipoleState.NORMAL
+                self.dipoles[1].state = DipoleState.NORMAL
+                self.dipoles[0].stuck_partner = None  # Убираем партнера по слипанию
+                self.dipoles[1].stuck_partner = None
 
     def set_average_speed(self, value: float) -> None:
         if self.count == 0:
@@ -89,9 +148,11 @@ class ParticleSystem:
         self.entities[:, 3] *= (value / average_speed)
 
     def get_full_kinetic(self):
-        return sum([get_kinetic(self.dipoles[i]) for i in range(2)])
+        return sum([get_kinetic(self.dipoles[i], mass=self.charge_mass, d_radius=self.d_radius, r=self.r) for i in range(2)])
     
     def proceed(self, dt: float):
+        self.max_kin = self.charge_mass * np.sum(1500 ** 2) + self.charge_mass * ((4 * (self.d_radius ** 2) / 5) + ((self.r ** 2) / 2)) * (300 ** 2)
+        self.update_dipole_pair()
         if self.count > 0:
             self.entities[:, 0] += self.entities[:, 2] * dt
             self.entities[:, 1] += self.entities[:, 3] * dt
@@ -107,9 +168,7 @@ class ParticleSystem:
             mask = self.entities[:, 1] > self.max_height
             self.entities[mask, 1] = self.max_height
             self.entities[mask, 3] *= -1
-        if self.ITERATION < 20:
-            #print(self.dipoles[0].pos, self.dipoles[0].c_vel, self.dipoles[0].actangle, self.dipoles[0].w)
-            self.ITERATION += 1
+
         for i in range(2):
             self.dipoles[i].pos += self.dipoles[i].c_vel * dt
             self.dipoles[i].actangle += self.dipoles[i].w * dt
@@ -162,12 +221,12 @@ class ParticleSystem:
                     r_diff = arr[mask, 0:2] - old_r
                     r_mag2 = r_diff[:, 0] ** 2 + r_diff[:, 1] ** 2
 
-                    scalar_dot = np.sum((arr[mask, 2:4] - old_v) * r_diff, axis=1) / r_mag2
+                    scalar_dot = np.sum((self.m * arr[mask, 2:4] - self.charge_mass * old_v) * r_diff, axis=1) / r_mag2
                     temp = r_diff.copy()
                     temp[:, 0] *= scalar_dot
                     temp[:, 1] *= scalar_dot
-                    arr[mask, 2:4] -= temp
-                    delta_v = np.sum(temp, axis=0) 
+                    arr[mask, 2:4] -= (temp / self.m)
+                    delta_v = np.sum(temp, axis=0) / self.charge_mass
                     proj = np.sum(np.array([-sin, cos]) * delta_v)
                     self.dipoles[i // 2].c_vel += delta_v / 2
                     if i % 2 == 0:
@@ -199,9 +258,9 @@ class ParticleSystem:
         pairs = [(0, 2), (0, 3), (1, 2), (1, 3)]
         for pair in pairs:
             if (pair[0] + pair[1]) % 2 == 0:
-                q1q2 = 1
+                q1q2 = self.charge ** 2
             else:
-                q1q2 = -1
+                q1q2 = -self.charge ** 2
             if pair[0] % 2 == 0:
                 pos0 = self.dipoles[pair[0] // 2].pos + self.r * np.array([math.cos(self.dipoles[pair[0] // 2].actangle), math.sin(self.dipoles[pair[0] // 2].actangle)])
             else:
@@ -212,22 +271,17 @@ class ParticleSystem:
                 pos1 = self.dipoles[pair[1] // 2].pos - self.r * np.array([math.cos(self.dipoles[pair[1] // 2].actangle), math.sin(self.dipoles[pair[1] // 2].actangle)])
             r = pos0 - pos1
             r_size = np.sqrt(r[0] ** 2 + r[1] ** 2).item()
-            '''
-            if r_size < self.radius + self.d_radius:
-                return False
-            '''
             f_kulon = 9e9 * q1q2 * r / (r_size + self.d_radius) ** 3
-            # if self.ITERATION < 20:
-            #    print(dt * f_kulon, self.dipoles[pair[0] // 2].c_vel + dt * f_kulon)
-            self.dipoles[pair[0] // 2].c_vel = self.dipoles[pair[0] // 2].c_vel + dt * f_kulon
-            proj = np.sum(f_kulon * np.array([-math.sin(self.dipoles[pair[0] // 2].actangle), math.cos(self.dipoles[pair[0] // 2].actangle)]))
+            a = f_kulon / self.charge_mass
+            self.dipoles[pair[0] // 2].c_vel = self.dipoles[pair[0] // 2].c_vel + dt * a
+            proj = np.sum(a * np.array([-math.sin(self.dipoles[pair[0] // 2].actangle), math.cos(self.dipoles[pair[0] // 2].actangle)]))
             if pair[0] % 2 == 0:
                 self.dipoles[pair[0] // 2].w += dt * proj / (3 * (self.r + 1))
             else:
                 self.dipoles[pair[0] // 2].w -= dt * proj / (3 * (self.r + 1))
-            f_kulon *= -1
-            self.dipoles[pair[1] // 2].c_vel = self.dipoles[pair[1] // 2].c_vel + dt * f_kulon
-            proj = np.sum(f_kulon * np.array([-math.sin(self.dipoles[pair[1] // 2].actangle), math.cos(self.dipoles[pair[1] // 2].actangle)]))
+            a *= -1
+            self.dipoles[pair[1] // 2].c_vel = self.dipoles[pair[1] // 2].c_vel + dt * a
+            proj = np.sum(a * np.array([-math.sin(self.dipoles[pair[1] // 2].actangle), math.cos(self.dipoles[pair[1] // 2].actangle)]))
             if pair[1] % 2 == 0:
                 self.dipoles[pair[1] // 2].w += dt * proj / (3 * (self.r + 1))
             else:
@@ -240,4 +294,4 @@ class ParticleSystem:
                 self.dipoles[i].c_vel /= coef
                 self.dipoles[i].w /= coef
         
-        return [get_kinetic(self.dipoles[i]) for i in range(2)]
+        return [get_kinetic(self.dipoles[i], mass=self.charge_mass, d_radius=self.d_radius, r=self.r) for i in range(2)]

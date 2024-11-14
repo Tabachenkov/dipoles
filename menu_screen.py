@@ -27,7 +27,7 @@ class MenuScreen():
                             "Computer demonstration of the course", "Statistical physics", "Dipoles' interaction",
                             ""]
         self.positions = [(400, 100), (500, 150), (700, 250), (800, 300), (730, 400), (670, 470)]
-        self.eng_positions = [(650, 100), (500, 150), (700, 250), (830, 300), (750, 400), (720, 470)]
+        self.eng_positions = [(650, 100), (500, 150), (700, 250), (830, 300), (790, 400), (760, 470)]
         self.cmc_logo = pygame.transform.scale(pygame.image.load("cmc_logo.jpg"), np.array((140, 140)) * self.scale)
         self.msu_logo = pygame.transform.scale(pygame.image.load("msu_logo.jpg"), np.array((150, 150)) * self.scale)
         self.buttons = [Button(app, "Демонстрация", (750, 600), (400, 80)), 

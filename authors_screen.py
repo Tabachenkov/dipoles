@@ -18,13 +18,13 @@ class AuthorsScreen():
                         "Лектор: Григорьев Кирилл Сергеевич",
                         "Руководитель: Чичигина Ольга Александровна",
                         "Табаченков Андрей",
-                        "Цыбанов Илья"]
+                        "Ильясов Эрик"]
         self.eng_strings = ["Lomonosov Moscow State University",
                             "Faculty of Computational Mathematics and Cybernetics",
                             "Lecturer: Grigoriev Kirill Sergeevich",
                             "Head: Olga Alexandrovna Chichigina",
                             "Tabachenkow Andrei",
-                            "Tsybanov Ilya"]
+                            "Ilyasov Eric"]
         self.russian = app.russian
         
         self.text_positions = np.array(((400, 100), (500, 150), (670, 850), (600, 790), (395, 720), (1250, 720)))
@@ -37,7 +37,7 @@ class AuthorsScreen():
                                                 (150 * self.app.scale, 150 * self.app.scale)),
                          pygame.transform.scale(pygame.image.load("andrei.jpg"), 
                                                 (400 * self.app.scale, 400 * self.app.scale)),
-                         pygame.transform.scale(pygame.image.load("ilya.jpg"), 
+                         pygame.transform.scale(pygame.image.load("eric.jpg"), 
                                                 (400 * self.app.scale, 400 * self.app.scale))]
         
         self.pictures_positions = [(1600 * self.app.scale, 80 * self.app.scale), 

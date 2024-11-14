@@ -6,6 +6,16 @@ from demo_screen import DemoScreen
 from menu_screen import MenuScreen
 from theory_screen import TheoryScreen
 
+import ctypes
+import os
+import sys
+
+if sys.platform == "win32":
+    try:
+        ctypes.windll.user32.SetProcessDPIAware()
+    except Exception as e:
+        print(f"Ошибка установки DPI: {e}")
+
 class App:
     def __init__(self) -> None:
         pygame.init()

@@ -34,7 +34,9 @@ class DemoScreen():
                         Button(self.app, "Назад" if self.app.russian else "Back", (1000, 900), (250, 70), font_size=30),
                         Button(self.app, "RUS/ENG", (1300, 900), (250, 70), font_size=30)]
 
-        self.dipole_colors = [Color.GOLD, Color.BLACK]
+        self.dipole_colors = [Color.GOLD, Color.GREEN]
+        self.plot_colors = ['gold', 'green']
+        self.particle_color = Color.BLACK
         self.dt = 0.01
         self.radius = 1.0
         self.width = 1500
@@ -187,8 +189,8 @@ class DemoScreen():
                 self.data[0].append(res[0])
                 self.data[1].append(res[1])
                 fig, axes = plt.subplots(1, 1)
-                axes.plot(self.dt * np.arange(len(self.data[0])), self.data[0], color='gold')
-                axes.plot(self.dt * np.arange(len(self.data[1])), self.data[1], color='black')
+                axes.plot(self.dt * np.arange(len(self.data[0])), self.data[0], color=self.plot_colors[0])
+                axes.plot(self.dt * np.arange(len(self.data[1])), self.data[1], color=self.plot_colors[1])
                 axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.")
                 axes.set_title("Кинетическая энергия диполей" if self.app.russian else "Kinematic energy of dipoles")
                 axes.set_xlim(xmin=0)
@@ -206,7 +208,7 @@ class DemoScreen():
                                 y=int(particle[1])
                             ),
                             radius=int(self.particle_system.radius),
-                            color=Color.GREEN
+                            color=self.particle_color
                         )
                 for i in range(2):
                     cos = math.cos(self.particle_system.dipoles[i].actangle)
@@ -243,8 +245,8 @@ class DemoScreen():
             pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width, self.height), 0)
             pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width, self.height), 1)
             fig, axes = plt.subplots(1, 1)
-            axes.plot(self.dt * np.arange(len(self.data[0])), self.data[0], color='gold')
-            axes.plot(self.dt * np.arange(len(self.data[1])), self.data[1], color='black')
+            axes.plot(self.dt * np.arange(len(self.data[0])), self.data[0], color=self.plot_colors[0])
+            axes.plot(self.dt * np.arange(len(self.data[1])), self.data[1], color=self.plot_colors[1])
             axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.")
             axes.set_title("Кинетическая энергия диполей" if self.app.russian else "Kinematic energy of dipoles")
             axes.set_xlim(xmin=0)
@@ -261,7 +263,7 @@ class DemoScreen():
                             y=int(particle[1])
                         ),
                         radius=int(self.particle_system.radius),
-                        color=Color.GREEN
+                        color=self.particle_color
                     )
             for i in range(2):
                 cos = math.cos(self.particle_system.dipoles[i].actangle)
@@ -295,8 +297,8 @@ class DemoScreen():
             pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width, self.height), 0)
             pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width, self.height), 1)
             fig, axes = plt.subplots(1, 1)
-            axes.plot(self.dt * np.arange(len(self.data[0])), self.data[0], color='gold')
-            axes.plot(self.dt * np.arange(len(self.data[1])), self.data[1], color='black')
+            axes.plot(self.dt * np.arange(len(self.data[0])), self.data[0], color=self.plot_colors[0])
+            axes.plot(self.dt * np.arange(len(self.data[1])), self.data[1], color=self.plot_colors[1])
             axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.")
             axes.set_title("Кинетическая энергия диполей" if self.app.russian else "Kinematic energy of dipoles")
             axes.set_xlim(xmin=0)

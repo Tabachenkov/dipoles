@@ -14,14 +14,14 @@ class DipoleState(Enum):
 def get_kinetic(dipole, mass=1, d_radius=5, r=15):
     return mass * np.sum(dipole.c_vel ** 2) + mass * ((4 * (d_radius ** 2) / 5) + ((r ** 2) / 2)) * (dipole.w ** 2)
 
-@dataclass
 class Dipole:
-    pos: np.ndarray
-    actangle: float
-    c_vel: np.ndarray = np.zeros(2)
-    w: float = 0.0
-    state: DipoleState = DipoleState.NORMAL
-    stuck_partner: 'Dipole' = None  # Партнер по "слипанию", если диполь слипающийся
+    def __init__(self, pos: np.array = np.array([0, 0]), actangle: float=0, c_vel: np.array = np.array([0, 0]).astype(float), w: float = 0):
+        self.pos: np.ndarray = pos
+        self.actangle: float = actangle
+        self.c_vel: np.ndarray = np.zeros(2)
+        self.w: float = 0.0
+        self.state: DipoleState = DipoleState.NORMAL
+        self.stuck_partner: 'Dipole' = None  # Партнер по "слипанию", если диполь слипающийся
 
 @dataclass
 class ParticleSystem:

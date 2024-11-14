@@ -22,24 +22,28 @@ class TheoryScreen():
 
         self.eng_text_positions = np.array(((700, 50),))
         
-        self.theory_pictures = [pygame.transform.scale(pygame.image.load("th1.png"), 
-                                                (908, 596))]
+        self.theory_pictures = [pygame.transform.scale(pygame.image.load("th1.png"), (908, 596)),
+                                pygame.transform.scale(pygame.image.load("th2.png"), (908, 596)),
+                                pygame.transform.scale(pygame.image.load("th3.png"), (908, 596)),
+                                pygame.transform.scale(pygame.image.load("th4.png"), (908, 596)),
+                                pygame.transform.scale(pygame.image.load("th5.png"), (908, 596))]
 
         self.active_picture = 0
         self.pictures_positions = [(1600 * self.app.scale, 80 * self.app.scale), 
-                                   (180 * self.app.scale, 80 * self.app.scale), 
-                                   (340 * self.app.scale, 300 * self.app.scale), 
-                                   (1160 * self.app.scale, 300 * self.app.scale)]
+                                   (1600 * self.app.scale, 80 * self.app.scale), 
+                                   (1600 * self.app.scale, 80 * self.app.scale), 
+                                   (1600 * self.app.scale, 80 * self.app.scale),
+                                   (1600 * self.app.scale, 80 * self.app.scale)]
         
-        self.theory_positions = ((320, 130), (320, 100), (320, 140), (320, 90), (320, 140), (320, 140))
+        self.theory_positions = ((320, 130), (320, 130), (320, 130), (320, 130), (320, 130), (320, 130))
 
         self.buttons = [Button(app, "Назад", (1400, 960), (300, 80)), Button(app, "RUS/ENG", (1710, 980), (170, 70), font_size=30), 
-                        Button(app, "<", (750, 960), (70, 70)), Button(app, ">", (1150, 960), (70, 70))]
+                        Button(app, "<", (750, 920), (70, 70)), Button(app, ">", (1150, 920), (70, 70))]
     
     def _update_screen(self):
         self.screen.fill(self.bg_color)
         self.strings_surfaces = []
-        self.buttons[:2] = [Button(self.app, "Назад" if self.app.russian else "Back", (1350, 960), (300, 80)), Button(self.app, "RUS/ENG", (1710, 980), (170, 70), font_size=30)]
+        self.buttons[:2] = [Button(self.app, "Назад" if self.app.russian else "Back", (1350, 920), (300, 80)), Button(self.app, "RUS/ENG", (1710, 920), (170, 70), font_size=30)]
         for index, string in enumerate(self.strings if self.app.russian else self.eng_strings):
             if index < 2:
                 self.strings_surfaces.append(self.middle_font.render(string, False, (0, 0, 0)))
@@ -49,8 +53,9 @@ class TheoryScreen():
         for index, surface in enumerate(self.strings_surfaces):
             self.screen.blit(surface, (self.text_positions[index] if self.app.russian else self.eng_text_positions[index]) * self.scale)
 
-        self.screen.blit(self.little_font.render(f"Страница {self.active_picture + 1} из 6" if self.app.russian else f"Page {self.active_picture + 1} of 1", 
-                                                 False, (0, 0, 0)), (np.array((870, 980)) if self.app.russian else np.array((900, 980))) * self.scale)
+        self.screen.blit(self.little_font.render(f"Страница {self.active_picture + 1} из {len(self.theory_pictures)}" if self.app.russian 
+                                                 else f"Page {self.active_picture + 1} of {len(self.theory_pictures)}", 
+                                                 False, (0, 0, 0)), (np.array((870, 950)) if self.app.russian else np.array((900, 950))) * self.scale)
 
         self.screen.blit(self.theory_pictures[self.active_picture], self.theory_positions[self.active_picture])
 
@@ -75,6 +80,6 @@ class TheoryScreen():
                     #self.app.menu_screen = MenuScreen(self.app)
                     self.app.demo_screen = DemoScreen(self.app)
                 if index == 3:
-                    self.active_picture = min(self.active_picture + 1, 0)
+                    self.active_picture = min(self.active_picture + 1, len(self.theory_pictures) - 1)
                 if index == 2:
                     self.active_picture = max(0, self.active_picture - 1)

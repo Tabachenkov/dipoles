@@ -42,7 +42,7 @@ class ParticleSystem:
         y_space = np.linspace(self.radius, self.max_height - self.radius, int(self.max_height // (2.5 * self.radius)))
         
         mesh = np.array(np.meshgrid(x_space, y_space)).T.reshape(-1, 2)
-        choice = np.random.choice(mesh.shape[0], self.count + 4, replace=False)
+        choice = np.random.choice(mesh.shape[0], self.count + 4)
         x = mesh[choice][:, 0]
         y = mesh[choice][:, 1]
         if self.count > 0:

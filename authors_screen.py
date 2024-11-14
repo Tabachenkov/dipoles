@@ -24,12 +24,12 @@ class AuthorsScreen():
                             "Lecturer: Grigoriev Kirill Sergeevich",
                             "Head: Olga Alexandrovna Chichigina",
                             "Tabachenkow Andrei",
-                            "Ilyasov Eric"]
+                            "Ilyassov Erik"]
         self.russian = app.russian
         
-        self.text_positions = np.array(((400, 100), (500, 150), (670, 850), (600, 790), (395, 720), (1250, 720)))
+        self.text_positions = np.array(((400, 100), (500, 150), (670, 850), (600, 790), (395, 720), (1270, 720)))
 
-        self.eng_text_positions = np.array(((650, 100), (500, 150), (700, 850), (710, 790), (395, 720), (1250, 720)))
+        self.eng_text_positions = np.array(((650, 100), (500, 150), (720, 850), (710, 790), (395, 720), (1270, 720)))
         
         self.pictures = [pygame.transform.scale(pygame.image.load("cmc_logo.jpg"), 
                                                 (140 * self.app.scale, 140 * self.app.scale)),

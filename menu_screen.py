@@ -20,14 +20,14 @@ class MenuScreen():
         self.demonstration_label = "Компьютерная демонстрация по курсу"
         self.subject_name = "Статистическая физика"
         self.demonstration_name = "Взаимодействие диполей"
-        self.demonstration_name_2 = ""
+        self.demonstration_name_2 = "в идеальном газе"
         self.strings = [self.msu_name, self.faculty_name, self.demonstration_label, self.subject_name,
                         self.demonstration_name, self.demonstration_name_2]
         self.eng_strings = ["Lomonosov Moscow State University", "Faculty of Computational Mathematics and Cybernetics",
                             "Computer demonstration of the course", "Statistical physics", "Dipoles' interaction",
-                            ""]
-        self.positions = [(400, 100), (500, 150), (700, 250), (800, 300), (730, 400), (670, 470)]
-        self.eng_positions = [(650, 100), (500, 150), (700, 250), (830, 300), (790, 400), (760, 470)]
+                            "in the ideal gas"]
+        self.positions = [(400, 100), (500, 150), (700, 250), (800, 300), (730, 400), (810, 470)]
+        self.eng_positions = [(650, 100), (500, 150), (700, 250), (830, 300), (790, 400), (830, 470)]
         self.cmc_logo = pygame.transform.scale(pygame.image.load("cmc_logo.jpg"), np.array((140, 140)) * self.scale)
         self.msu_logo = pygame.transform.scale(pygame.image.load("msu_logo.jpg"), np.array((150, 150)) * self.scale)
         self.buttons = [Button(app, "Демонстрация", (750, 600), (400, 80)), 
@@ -73,8 +73,8 @@ class MenuScreen():
                 if index == 0:
                     self.app.active_screen = self.app.demo_screen
                 elif index == 1:
-                    #self.app.active_screen = self.app.theory_screen
-                    continue 
+                    self.app.active_screen = self.app.theory_screen
+                    #continue
                 elif index == 2:
                     self.app.active_screen = self.app.authors_screen
                 elif index == 3:

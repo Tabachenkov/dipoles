@@ -15,6 +15,9 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('module://pygame_matplotlib.backend_pygame')
 plt.rcParams["figure.figsize"] = (10, 5)
+plt.rcParams['font.size'] = 10.0
+plt.tight_layout()
+plt.rcParams['lines.linewidth'] = 5.0
 
 NOT_STARTED = 0
 PAUSED = 1
@@ -52,51 +55,53 @@ class DemoScreen():
 
         self.mode = NOT_STARTED
         self.slider = Slider(self.screen, x=1600, y=50, width=250, height=10, min=0, max=2000, initial=0, step=1)
-        self.textbox = TextBox(self.screen, 1710, 70, 40, 20, fontSize=10)
+        self.textbox = TextBox(self.screen, 1700, 70, 60, 30, fontSize=20)
         self.particles_number = 1000
         self.speed = 500
         self.slider_s = Slider(self.screen, x=1600, y=150, width=250, height=10, min=1, max=1000, initial=500, step=1)
-        self.textbox_s = TextBox(self.screen, 1710, 170, 40, 20, fontSize=10)
+        self.textbox_s = TextBox(self.screen, 1700, 170, 60, 30, fontSize=20)
         self.slider_dt = Slider(self.screen, x=1600, y=250, width=250, height=10, min=0.005, max=0.1, initial=0.01, step=0.005)
-        self.textbox_dt = TextBox(self.screen, 1710, 270, 40, 20, fontSize=10)
+        self.textbox_dt = TextBox(self.screen, 1700, 270, 60, 30, fontSize=20)
         self.slider_radius = Slider(self.screen, x=1600, y=350, width=250, height=10, min=1, max=10, initial=1, step=1)
-        self.textbox_radius = TextBox(self.screen, 1710, 370, 40, 20, fontSize=10)
+        self.textbox_radius = TextBox(self.screen, 1700, 370, 60, 30, fontSize=20)
         self.slider_width = Slider(self.screen, x=1600, y=450, width=250, height=10, min=100, max=1500, initial=1500, step=100)
-        self.textbox_width = TextBox(self.screen, 1710, 470, 40, 20, fontSize=10)
+        self.textbox_width = TextBox(self.screen, 1700, 470, 60, 30, fontSize=20)
         self.slider_height = Slider(self.screen, x=1600, y=550, width=250, height=10, min=100, max=500, initial=500, step=100)
-        self.textbox_height = TextBox(self.screen, 1710, 570, 40, 20, fontSize=10)
+        self.textbox_height = TextBox(self.screen, 1700, 570, 60, 30, fontSize=20)
         self.slider_d_radius = Slider(self.screen, x=1600, y=650, width=250, height=10, min=1, max=15, initial=5, step=1)
-        self.textbox_d_radius = TextBox(self.screen, 1710, 670, 40, 20, fontSize=10)
+        self.textbox_d_radius = TextBox(self.screen, 1700, 670, 60, 30, fontSize=20)
         self.slider_r = Slider(self.screen, x=1600, y=750, width=250, height=10, min=15, max=100, initial=15, step=1)
-        self.textbox_r = TextBox(self.screen, 1710, 770, 40, 20, fontSize=10)
+        self.textbox_r = TextBox(self.screen, 1700, 770, 60, 30, fontSize=20)
         self.slider_charge = Slider(self.screen, x=1600, y=850, width=250, height=10, min=1, max=10, initial=1, step=1)
-        self.textbox_charge = TextBox(self.screen, 1710, 870, 40, 20, fontSize=10)
+        self.textbox_charge = TextBox(self.screen, 1700, 870, 60, 30, fontSize=20)
         self.slider_charge_mass = Slider(self.screen, x=1600, y=950, width=250, height=10, min=1, max=50, initial=1, step=1)
-        self.textbox_charge_mass = TextBox(self.screen, 1710, 970, 40, 20, fontSize=10)
+        self.textbox_charge_mass = TextBox(self.screen, 1700, 970, 60, 30, fontSize=20)
         self.slider_m = Slider(self.screen, x=1000, y=600, width=250, height=10, min=1, max=50, initial=1, step=1)
-        self.textbox_m = TextBox(self.screen, 1000, 620, 40, 20, fontSize=10)
+        self.textbox_m = TextBox(self.screen, 1100, 620, 60, 30, fontSize=20)
 
-        self.strings = ["Количество частиц", "Средняя скорость частиц", "dt, сек.", 
+        self.strings = ["Количество частиц", "Средняя скорость частиц", "Шаг времени, сек.", 
         "Радиус частицы", "Ширина", "Высота", "Радиус заряда", "Расстояние между зарядами", "Величина заряда",
         "Масса заряда", "Масса частицы",
         "Средняя кин. энергия 1 диполя: 0", "Стандартное отклонение кин. энергии 1 диполя",
         "Средняя кин. энергия 2 диполя: 0", "Стандартное отклонение кин. энергии 2 диполя"]
-        self.eng_strings = ["Number of particles", "Average speed of particles", "dt, sec.", 
+        self.eng_strings = ["Number of particles", "Average speed of particles", "Time step, sec.", 
         "Particle radius", "Width", "Height", "Charge radius", "Distance between charges", "Charge value",
         "Charge mass", "Particle mass",
         "Average kin. energy of 1 dipole: 0", "Standard dev. of 1 dipole: 0",
         "Average kin. energy of 2 dipole: 0", "Standard dev. of 2 dipole: 0"]
-        self.positions = [(1620, 20), (1600, 120), (1600, 220), (1600, 320), (1600, 420), (1600, 520), (1600, 620), (1600, 720), (1600, 820), (1600, 920), 
+        self.positions = [(1600, 20), (1600, 120), (1600, 220), (1600, 320), (1600, 420), (1600, 520), (1600, 620), (1600, 720), (1600, 820), (1600, 920), 
                           (1000, 570),  
                           (1000, 660), (1000, 690), (1000, 720), (1000, 750)]
-        self.eng_positions = [(1620, 20), (1600, 120), (1600, 220), (1600, 320), (1600, 420), (1600, 520), (1600, 620), (1600, 720), (1600, 820), (1600, 920),
+        self.eng_positions = [(1600, 20), (1600, 120), (1600, 220), (1600, 320), (1600, 420), (1600, 520), (1600, 620), (1600, 720), (1600, 820), (1600, 920),
                               (1000, 570),   
                               (1000, 660), (1000, 690), (1000, 720), (1000, 750)]
 
-        self.data = [[], []]
+        self.times = [0]
+        self.data = [[0], [0]]
 
         self.particle_system = ParticleSystem(self.particles_number, self.radius, max_width=self.width, max_height=self.height, 
                                                           avg_vel=self.speed, d_radius=self.d_radius, r=self.r, charge=self.charge, charge_mass=self.charge_mass, m=1)
+        #print(plt.rcParams)
 
     def _check_events(self):
         events = pygame.event.get()
@@ -164,10 +169,10 @@ class DemoScreen():
         self.strings_surfaces = []
         for i in range(2):
             if len(self.data[i]) > 0:
-                self.strings[-4 + 2 * i] = f"Средняя кин. энергия {i + 1} диполя: " + f'{int(np.average(np.array(self.data[0])).item())}'
-                self.strings[-3 + 2 * i] = f"Стандарт. отклон. кин. энергии {i + 1} диполя: " + f'{int(np.sqrt(np.var(np.array(self.data[0]))).item())}'
-                self.eng_strings[-4 + 2 * i] = f"Average kin. energy of {i + 1} dipole: " + f'{int(np.average(np.array(self.data[0])).item())}'
-                self.eng_strings[-3 + 2 * i] = f"Standard dev. of {i + 1} dipole: " + f'{int(np.sqrt(np.var(np.array(self.data[0]))).item())}'
+                self.strings[-4 + 2 * i] = f"Средняя кин. энергия {i + 1} диполя: " + f'{int(np.average(np.array(self.data[i])).item())}'
+                self.strings[-3 + 2 * i] = f"Стандарт. отклон. кин. энергии {i + 1} диполя: " + f'{int(np.sqrt(np.var(np.array(self.data[i]))).item())}'
+                self.eng_strings[-4 + 2 * i] = f"Average kin. energy of {i + 1} dipole: " + f'{int(np.average(np.array(self.data[i])).item())}'
+                self.eng_strings[-3 + 2 * i] = f"Standard dev. of {i + 1} dipole: " + f'{int(np.sqrt(np.var(np.array(self.data[i]))).item())}'
             else:
                 self.strings[-4 + 2 * i] = f"Средняя кин. энергия {i + 1} диполя: 0"
                 self.strings[-3 + 2 * i] = f"Стандарт. отклон. кин. энергии {i + 1} диполя: 0"
@@ -186,15 +191,22 @@ class DemoScreen():
             pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width, self.height), 1)
             res = self.particle_system.proceed(self.dt)
             if res != False:
-                self.data[0].append(res[0])
-                self.data[1].append(res[1])
+                self.data[0].append(res[0].item())
+                self.data[1].append(res[1].item())
+                self.times.append(self.times[-1] + self.dt)
+                if self.times[-1] - self.times[0] >= 20:
+                    self.times = self.times[1:]
+                    self.data[0] = self.data[0][1:]
+                    self.data[1] = self.data[1][1:]
                 fig, axes = plt.subplots(1, 1)
-                axes.plot(self.dt * np.arange(len(self.data[0])), self.data[0], color=self.plot_colors[0])
-                axes.plot(self.dt * np.arange(len(self.data[1])), self.data[1], color=self.plot_colors[1])
-                axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.")
-                axes.set_title("Кинетическая энергия диполей" if self.app.russian else "Kinematic energy of dipoles")
-                axes.set_xlim(xmin=0)
+                axes.plot(self.times, self.data[0], color=self.plot_colors[0])
+                axes.plot(self.times, self.data[1], color=self.plot_colors[1])
+                axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.", fontsize=15)
+                axes.set_title("Кинетическая энергия диполей" if self.app.russian else "Kinematic energy of dipoles", fontsize=15)
+                axes.set_xlim(xmin=self.times[0])
                 axes.set_ylim(ymin=0)
+                plt.legend(['диполь 1', 'диполь 2'] if self.app.russian else ['dipole 1', 'dipole 2'], loc='upper left', fontsize=15)
+                axes.grid()
                 fig.canvas.draw()
                 self.screen.blit(fig, (0, 500))
                 plt.close()
@@ -234,7 +246,7 @@ class DemoScreen():
                         color=Color.RED
                     )
                     pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0], pos0[1]),
-                                    (pos1[0], pos1[1]))
+                                    (pos1[0], pos1[1]), width=5)
             else:
                 self.mode = NOT_STARTED
         elif self.mode == PAUSED:
@@ -245,12 +257,14 @@ class DemoScreen():
             pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width, self.height), 0)
             pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width, self.height), 1)
             fig, axes = plt.subplots(1, 1)
-            axes.plot(self.dt * np.arange(len(self.data[0])), self.data[0], color=self.plot_colors[0])
-            axes.plot(self.dt * np.arange(len(self.data[1])), self.data[1], color=self.plot_colors[1])
-            axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.")
-            axes.set_title("Кинетическая энергия диполей" if self.app.russian else "Kinematic energy of dipoles")
-            axes.set_xlim(xmin=0)
+            axes.plot(self.times, self.data[0], color=self.plot_colors[0])
+            axes.plot(self.times, self.data[1], color=self.plot_colors[1])
+            axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.", fontsize=15)
+            axes.set_title("Кинетическая энергия диполей" if self.app.russian else "Kinematic energy of dipoles", fontsize=15)
+            axes.set_xlim(xmin=self.times[0])
             axes.set_ylim(ymin=0)
+            plt.legend(['диполь 1', 'диполь 2'] if self.app.russian else ['dipole 1', 'dipole 2'], loc='upper left', fontsize=15)
+            plt.grid()
             fig.canvas.draw()
             self.screen.blit(fig, (0, 500))
             plt.close()
@@ -297,12 +311,14 @@ class DemoScreen():
             pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width, self.height), 0)
             pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width, self.height), 1)
             fig, axes = plt.subplots(1, 1)
-            axes.plot(self.dt * np.arange(len(self.data[0])), self.data[0], color=self.plot_colors[0])
-            axes.plot(self.dt * np.arange(len(self.data[1])), self.data[1], color=self.plot_colors[1])
-            axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.")
-            axes.set_title("Кинетическая энергия диполей" if self.app.russian else "Kinematic energy of dipoles")
-            axes.set_xlim(xmin=0)
+            axes.plot(self.times, self.data[0], color=self.plot_colors[0])
+            axes.plot(self.times, self.data[1], color=self.plot_colors[1])
+            axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.", fontsize=15)
+            axes.set_title("Кинетическая энергия диполей" if self.app.russian else "Kinematic energy of dipoles", fontsize=15)
+            axes.set_xlim(xmin=self.times[0])
             axes.set_ylim(ymin=0)
+            plt.legend(['диполь 1', 'диполь 2'] if self.app.russian else ['dipole 1', 'dipole 2'], loc='upper left', fontsize=15)
+            plt.grid()
             fig.canvas.draw()
             self.screen.blit(fig, (0, 500))
             plt.close()
@@ -341,7 +357,8 @@ class DemoScreen():
                     self.mode = ACTIVATED
                     self.particle_system = ParticleSystem(self.particles_number, self.radius, max_width=self.width, max_height=self.height, 
                                                           avg_vel=self.speed, d_radius=self.d_radius, r=self.r, charge=self.charge, charge_mass=self.charge_mass, m=1)
-                    self.data = [[], []]
+                    self.times = [0]
+                    self.data = [[0], [0]]
                 elif button.msg == 'Остановить' or button.msg == 'Stop':
                     self.mode = PAUSED
                 elif button.msg == 'Возобновить' or button.msg == 'Continue':

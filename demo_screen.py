@@ -64,9 +64,9 @@ class DemoScreen():
         self.textbox_dt = TextBox(self.screen, 1700, 270, 60, 30, fontSize=20)
         self.slider_radius = Slider(self.screen, x=1600, y=350, width=250, height=10, min=1, max=10, initial=1, step=1)
         self.textbox_radius = TextBox(self.screen, 1700, 370, 60, 30, fontSize=20)
-        self.slider_width = Slider(self.screen, x=1600, y=450, width=250, height=10, min=100, max=1500, initial=1500, step=100)
+        self.slider_width = Slider(self.screen, x=1600, y=450, width=250, height=10, min=300, max=1500, initial=1500, step=100)
         self.textbox_width = TextBox(self.screen, 1700, 470, 60, 30, fontSize=20)
-        self.slider_height = Slider(self.screen, x=1600, y=550, width=250, height=10, min=100, max=500, initial=500, step=100)
+        self.slider_height = Slider(self.screen, x=1600, y=550, width=250, height=10, min=300, max=500, initial=500, step=100)
         self.textbox_height = TextBox(self.screen, 1700, 570, 60, 30, fontSize=20)
         self.slider_d_radius = Slider(self.screen, x=1600, y=650, width=250, height=10, min=1, max=15, initial=5, step=1)
         self.textbox_d_radius = TextBox(self.screen, 1700, 670, 60, 30, fontSize=20)
@@ -167,13 +167,20 @@ class DemoScreen():
     def _update_screen(self):
         self.screen.fill(self.bg_color)
         self.strings_surfaces = []
-        for i in range(2):
-            if len(self.data[i]) > 0:
-                self.strings[-4 + 2 * i] = f"Средняя кин. энергия {i + 1} диполя: " + f'{int(np.average(np.array(self.data[i])).item())}'
-                self.strings[-3 + 2 * i] = f"Стандарт. отклон. кин. энергии {i + 1} диполя: " + f'{int(np.sqrt(np.var(np.array(self.data[i]))).item())}'
-                self.eng_strings[-4 + 2 * i] = f"Average kin. energy of {i + 1} dipole: " + f'{int(np.average(np.array(self.data[i])).item())}'
-                self.eng_strings[-3 + 2 * i] = f"Standard dev. of {i + 1} dipole: " + f'{int(np.sqrt(np.var(np.array(self.data[i]))).item())}'
-            else:
+        try:
+            for i in range(2):
+                if len(self.data[i]) > 0:
+                    self.strings[-4 + 2 * i] = f"Средняя кин. энергия {i + 1} диполя: " + f'{int(np.average(np.array(self.data[i])).item())}'
+                    self.strings[-3 + 2 * i] = f"Стандарт. отклон. кин. энергии {i + 1} диполя: " + f'{int(np.sqrt(np.var(np.array(self.data[i]))).item())}'
+                    self.eng_strings[-4 + 2 * i] = f"Average kin. energy of {i + 1} dipole: " + f'{int(np.average(np.array(self.data[i])).item())}'
+                    self.eng_strings[-3 + 2 * i] = f"Standard dev. of {i + 1} dipole: " + f'{int(np.sqrt(np.var(np.array(self.data[i]))).item())}'
+                else:
+                    self.strings[-4 + 2 * i] = f"Средняя кин. энергия {i + 1} диполя: 0"
+                    self.strings[-3 + 2 * i] = f"Стандарт. отклон. кин. энергии {i + 1} диполя: 0"
+                    self.eng_strings[-4 + 2 * i] = f"Average kin. energy of {i + 1} dipole: 0"
+                    self.eng_strings[-3 + 2 * i] = f"Standard dev. of {i + 1} dipole: 0"
+        except:
+            for i in range(2):
                 self.strings[-4 + 2 * i] = f"Средняя кин. энергия {i + 1} диполя: 0"
                 self.strings[-3 + 2 * i] = f"Стандарт. отклон. кин. энергии {i + 1} диполя: 0"
                 self.eng_strings[-4 + 2 * i] = f"Average kin. energy of {i + 1} dipole: 0"
@@ -189,8 +196,8 @@ class DemoScreen():
                             Button(self.app, "RUS/ENG", (1300, 900), (250, 70), font_size=30)]
             pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width, self.height), 0)
             pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width, self.height), 1)
-            res = self.particle_system.proceed(self.dt)
-            if res != False:
+            try:
+                res = self.particle_system.proceed(self.dt)
                 self.data[0].append(res[0].item())
                 self.data[1].append(res[1].item())
                 self.times.append(self.times[-1] + self.dt)
@@ -247,8 +254,8 @@ class DemoScreen():
                     )
                     pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0], pos0[1]),
                                     (pos1[0], pos1[1]), width=5)
-            else:
-                self.mode = NOT_STARTED
+            except:
+                self.mode = NOT_STARTED    
         elif self.mode == PAUSED:
             self.buttons = [Button(self.app, "Завершить" if self.app.russian else "Finish", (1000, 800), (250, 70), font_size=30),
                             Button(self.app, "Возобновить" if self.app.russian else "Continue", (1300, 800), (250, 70), font_size=30),

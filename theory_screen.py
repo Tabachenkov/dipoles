@@ -35,7 +35,7 @@ class TheoryScreen():
                                    (1600 * self.app.scale, 80 * self.app.scale),
                                    (1600 * self.app.scale, 80 * self.app.scale)]
         
-        self.theory_positions = ((320, 130), (320, 130), (320, 130), (320, 130), (320, 130), (320, 130))
+        self.theory_positions = ((250, 130), (250, 130), (250, 130), (250, 130), (320, 130), (320, 130))
 
         self.buttons = [Button(app, "Назад", (1400, 960), (300, 80)), Button(app, "RUS/ENG", (1710, 980), (170, 70), font_size=30), 
                         Button(app, "<", (750, 920), (70, 70)), Button(app, ">", (1150, 920), (70, 70))]

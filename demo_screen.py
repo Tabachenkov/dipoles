@@ -38,9 +38,9 @@ class DemoScreen():
                         Button(self.app, "RUS/ENG", (1300, 900), (250, 70), font_size=30)]
 
         self.dipole_colors = [Color.GOLD, Color.GREEN]
-        self.plot_colors = ['gold', 'green']
+        self.plot_colors = ['gold', 'green', 'purple', 'brown']
         self.particle_color = Color.BLACK
-        self.dt = 0.01
+        self.dt = 0.0001
         self.radius = 1.0
         self.width = 1500
         self.height = 500
@@ -49,6 +49,7 @@ class DemoScreen():
         self.charge = 1
         self.charge_mass = 1
         self.m = 1
+        self.scale0 = 1
 
         pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width, self.height), 0)
         pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width, self.height), 1)
@@ -60,8 +61,6 @@ class DemoScreen():
         self.speed = 500
         self.slider_s = Slider(self.screen, x=1600, y=150, width=250, height=10, min=1, max=1000, initial=500, step=1)
         self.textbox_s = TextBox(self.screen, 1700, 170, 60, 30, fontSize=20)
-        self.slider_dt = Slider(self.screen, x=1600, y=250, width=250, height=10, min=0.005, max=0.1, initial=0.01, step=0.005)
-        self.textbox_dt = TextBox(self.screen, 1700, 270, 60, 30, fontSize=20)
         self.slider_radius = Slider(self.screen, x=1600, y=350, width=250, height=10, min=1, max=10, initial=1, step=1)
         self.textbox_radius = TextBox(self.screen, 1700, 370, 60, 30, fontSize=20)
         self.slider_width = Slider(self.screen, x=1600, y=450, width=250, height=10, min=300, max=1500, initial=1500, step=100)
@@ -70,7 +69,7 @@ class DemoScreen():
         self.textbox_height = TextBox(self.screen, 1700, 570, 60, 30, fontSize=20)
         self.slider_d_radius = Slider(self.screen, x=1600, y=650, width=250, height=10, min=1, max=15, initial=5, step=1)
         self.textbox_d_radius = TextBox(self.screen, 1700, 670, 60, 30, fontSize=20)
-        self.slider_r = Slider(self.screen, x=1600, y=750, width=250, height=10, min=15, max=100, initial=15, step=1)
+        self.slider_r = Slider(self.screen, x=1600, y=750, width=250, height=10, min=15 * 2, max=100 * 2, initial=15 * 2, step=2)
         self.textbox_r = TextBox(self.screen, 1700, 770, 60, 30, fontSize=20)
         self.slider_charge = Slider(self.screen, x=1600, y=850, width=250, height=10, min=1, max=10, initial=1, step=1)
         self.textbox_charge = TextBox(self.screen, 1700, 870, 60, 30, fontSize=20)
@@ -97,11 +96,12 @@ class DemoScreen():
                               (1000, 660), (1000, 690), (1000, 720), (1000, 750)]
 
         self.times = [0]
-        self.data = [[0], [0]]
+        self.data = [[0], [0], [0], [0]]
+        self.has_data = False
 
         self.particle_system = ParticleSystem(self.particles_number, self.radius, max_width=self.width, max_height=self.height, 
-                                                          avg_vel=self.speed, d_radius=self.d_radius, r=self.r, charge=self.charge, charge_mass=self.charge_mass, m=1)
-        #print(plt.rcParams)
+                                                          avg_vel=self.speed, d_radius=self.d_radius, r=self.r / 2, 
+                                                          charge=self.charge, charge_mass=self.charge_mass, m=1, scale=self.scale0)
 
     def _check_events(self):
         events = pygame.event.get()
@@ -114,7 +114,6 @@ class DemoScreen():
         pygame_widgets.update(events)
         self.slider.listen(events)
         self.slider_s.listen(events)
-        self.slider_dt.listen(events)
         self.slider_radius.listen(events)
         self.slider_width.listen(events)
         self.slider_height.listen(events)
@@ -126,7 +125,6 @@ class DemoScreen():
 
         self.textbox.listen(events)
         self.textbox_s.listen(events)
-        self.textbox_dt.listen(events)
         self.textbox_radius.listen(events)
         self.textbox_width.listen(events)
         self.textbox_height.listen(events)
@@ -138,7 +136,6 @@ class DemoScreen():
 
         self.textbox.setText(self.slider.getValue())
         self.textbox_s.setText(self.slider_s.getValue())
-        self.textbox_dt.setText(self.slider_dt.getValue())
         self.textbox_radius.setText(self.slider_radius.getValue())
         self.textbox_width.setText(self.slider_width.getValue())
         self.textbox_height.setText(self.slider_height.getValue())
@@ -150,7 +147,6 @@ class DemoScreen():
 
         self.particles_number = self.slider.getValue()
         self.speed = self.slider_s.getValue()
-        self.dt = self.slider_dt.getValue()
         self.radius = self.slider_radius.getValue()
         self.width = self.slider_width.getValue()
         self.height = self.slider_height.getValue()
@@ -200,33 +196,41 @@ class DemoScreen():
                 res = self.particle_system.proceed(self.dt)
                 self.data[0].append(res[0].item())
                 self.data[1].append(res[1].item())
+                self.data[2].append(res[2])
+                self.data[3].append(res[3].item())
                 self.times.append(self.times[-1] + self.dt)
-                if self.times[-1] - self.times[0] >= 20:
+                if not self.has_data or self.times[-1] - self.times[0] >= 20:
+                    self.has_data = True
                     self.times = self.times[1:]
                     self.data[0] = self.data[0][1:]
                     self.data[1] = self.data[1][1:]
+                    self.data[2] = self.data[2][1:]
+                    self.data[3] = self.data[3][1:]
                 fig, axes = plt.subplots(1, 1)
                 axes.plot(self.times, self.data[0], color=self.plot_colors[0])
                 axes.plot(self.times, self.data[1], color=self.plot_colors[1])
+                axes.plot(self.times, self.data[2], color=self.plot_colors[2])
+                axes.plot(self.times, self.data[3], color=self.plot_colors[3])
                 axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.", fontsize=15)
-                axes.set_title("Кинетическая энергия диполей" if self.app.russian else "Kinematic energy of dipoles", fontsize=15)
+                axes.set_title("Энергии диполей" if self.app.russian else "Dipoles' energies", fontsize=15)
                 axes.set_xlim(xmin=self.times[0])
-                axes.set_ylim(ymin=0)
-                plt.legend(['диполь 1', 'диполь 2'] if self.app.russian else ['dipole 1', 'dipole 2'], loc='upper left', fontsize=15)
+                axes.set_ylim(ymin=min(self.data[2] + self.data[0] + self.data[1]))
+                plt.legend(['диполь 1 (кин.)', 'диполь 2 (кин.)', 'Потенц.', 'Полная'] if self.app.russian 
+                            else ['dipole 1 (kin)', 'dipole 2 (kin)', 'Poten.', 'Full'], loc='upper left', fontsize=15)
                 axes.grid()
                 fig.canvas.draw()
                 self.screen.blit(fig, (0, 500))
                 plt.close()
-                self.particle_system.set_average_speed(self.speed)
+                self.particle_system.set_average_speed(self.speed * self.scale0)
                 if self.particle_system.count > 0:
                     for particle in self.particle_system.entities:
                         pygame_draw_filled_circle(
                             surface=self.screen,
                             pos=Position(
-                                x=int(particle[0]),
-                                y=int(particle[1])
+                                x=int(particle[0] / self.scale0),
+                                y=int(particle[1] / self.scale0)
                             ),
-                            radius=int(self.particle_system.radius),
+                            radius=int(self.particle_system.radius / self.scale0),
                             color=self.particle_color
                         )
                 for i in range(2):
@@ -237,23 +241,23 @@ class DemoScreen():
                     pygame_draw_filled_circle(
                         surface=self.screen,
                         pos=Position(
-                            x=int(pos0[0]),
-                            y=int(pos0[1])
+                            x=int(pos0[0] / self.scale0),
+                            y=int(pos0[1] / self.scale0)
                         ),
-                        radius=int(self.particle_system.d_radius),
+                        radius=int(self.particle_system.d_radius / self.scale0),
                         color=Color.BLUE
                     )
                     pygame_draw_filled_circle(
                         surface=self.screen,
                         pos=Position(
-                            x=int(pos1[0]),
-                            y=int(pos1[1])
+                            x=int(pos1[0] / self.scale0),
+                            y=int(pos1[1] / self.scale0)
                         ),
-                        radius=int(self.particle_system.d_radius),
+                        radius=int(self.particle_system.d_radius / self.scale0),
                         color=Color.RED
                     )
-                    pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0], pos0[1]),
-                                    (pos1[0], pos1[1]), width=5)
+                    pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0] / self.scale0, pos0[1] / self.scale0),
+                                    (pos1[0] / self.scale0, pos1[1] / self.scale0), width=5)
             except:
                 self.mode = NOT_STARTED    
         elif self.mode == PAUSED:
@@ -266,11 +270,14 @@ class DemoScreen():
             fig, axes = plt.subplots(1, 1)
             axes.plot(self.times, self.data[0], color=self.plot_colors[0])
             axes.plot(self.times, self.data[1], color=self.plot_colors[1])
+            axes.plot(self.times, self.data[2], color=self.plot_colors[2])
+            axes.plot(self.times, self.data[3], color=self.plot_colors[3])
             axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.", fontsize=15)
-            axes.set_title("Кинетическая энергия диполей" if self.app.russian else "Kinematic energy of dipoles", fontsize=15)
+            axes.set_title("Энергии диполей" if self.app.russian else "Dipoles' energies", fontsize=15)
             axes.set_xlim(xmin=self.times[0])
-            axes.set_ylim(ymin=0)
-            plt.legend(['диполь 1', 'диполь 2'] if self.app.russian else ['dipole 1', 'dipole 2'], loc='upper left', fontsize=15)
+            axes.set_ylim(ymin=min(self.data[2] + self.data[0] + self.data[1]))
+            plt.legend(['диполь 1 (кин.)', 'диполь 2 (кин.)', 'Потенц.', 'Полная'] if self.app.russian 
+                        else ['dipole 1 (kin)', 'dipole 2 (kin)', 'Poten.', 'Full'], loc='upper left', fontsize=15)
             plt.grid()
             fig.canvas.draw()
             self.screen.blit(fig, (0, 500))
@@ -280,10 +287,10 @@ class DemoScreen():
                     pygame_draw_filled_circle(
                         surface=self.screen,
                         pos=Position(
-                            x=int(particle[0]),
-                            y=int(particle[1])
+                            x=int(particle[0] / self.scale0),
+                            y=int(particle[1] / self.scale0)
                         ),
-                        radius=int(self.particle_system.radius),
+                        radius=int(self.particle_system.radius / self.scale0),
                         color=self.particle_color
                     )
             for i in range(2):
@@ -294,23 +301,23 @@ class DemoScreen():
                 pygame_draw_filled_circle(
                     surface=self.screen,
                     pos=Position(
-                        x=int(pos0[0]),
-                        y=int(pos0[1])
+                        x=int(pos0[0] / self.scale0),
+                        y=int(pos0[1] / self.scale0)
                     ),
-                    radius=int(self.particle_system.d_radius),
+                    radius=int(self.particle_system.d_radius / self.scale0),
                     color=Color.BLUE
                 )
                 pygame_draw_filled_circle(
                     surface=self.screen,
                     pos=Position(
-                        x=int(pos1[0]),
-                        y=int(pos1[1])
+                        x=int(pos1[0] / self.scale0),
+                        y=int(pos1[1] / self.scale0)
                     ),
-                    radius=int(self.particle_system.d_radius),
+                    radius=int(self.particle_system.d_radius / self.scale0),
                     color=Color.RED
                 )
-                pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0], pos0[1]),
-                                (pos1[0], pos1[1]))
+                pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0] / self.scale0, pos0[1] / self.scale0),
+                                (pos1[0] / self.scale0, pos1[1] / self.scale0), width=5)
         else:
             self.buttons = [Button(self.app, "Начать" if self.app.russian else "Start", (1000, 800), (250, 70), font_size=30),
                         Button(self.app, "Назад" if self.app.russian else "Back", (1000, 900), (250, 70), font_size=30),
@@ -320,11 +327,14 @@ class DemoScreen():
             fig, axes = plt.subplots(1, 1)
             axes.plot(self.times, self.data[0], color=self.plot_colors[0])
             axes.plot(self.times, self.data[1], color=self.plot_colors[1])
+            axes.plot(self.times, self.data[2], color=self.plot_colors[2])
+            axes.plot(self.times, self.data[3], color=self.plot_colors[3])
             axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.", fontsize=15)
-            axes.set_title("Кинетическая энергия диполей" if self.app.russian else "Kinematic energy of dipoles", fontsize=15)
+            axes.set_title("Энергии диполей" if self.app.russian else "Dipoles' energies", fontsize=15)
             axes.set_xlim(xmin=self.times[0])
-            axes.set_ylim(ymin=0)
-            plt.legend(['диполь 1', 'диполь 2'] if self.app.russian else ['dipole 1', 'dipole 2'], loc='upper left', fontsize=15)
+            axes.set_ylim(ymin=min(self.data[2] + self.data[0] + self.data[1]))
+            plt.legend(['диполь 1 (кин.)', 'диполь 2 (кин.)', 'Потенц.', 'Полная'] if self.app.russian 
+                        else ['dipole 1 (kin)', 'dipole 2 (kin)', 'Poten.', 'Full'], loc='upper left', fontsize=15)
             plt.grid()
             fig.canvas.draw()
             self.screen.blit(fig, (0, 500))
@@ -341,8 +351,6 @@ class DemoScreen():
         self.textbox.draw()
         self.slider_s.draw()
         self.textbox_s.draw()
-        self.slider_dt.draw()
-        self.textbox_dt.draw()
         self.textbox_radius.draw()
         self.textbox_width.draw()
         self.textbox_height.draw()
@@ -363,9 +371,11 @@ class DemoScreen():
                 elif button.msg == 'Начать' or button.msg == 'Start':
                     self.mode = ACTIVATED
                     self.particle_system = ParticleSystem(self.particles_number, self.radius, max_width=self.width, max_height=self.height, 
-                                                          avg_vel=self.speed, d_radius=self.d_radius, r=self.r, charge=self.charge, charge_mass=self.charge_mass, m=1)
+                                                          avg_vel=self.speed, d_radius=self.d_radius, r=self.r / 2, charge=self.charge, 
+                                                          charge_mass=self.charge_mass, m=1, scale=self.scale0)
                     self.times = [0]
-                    self.data = [[0], [0]]
+                    self.data = [[0], [0], [0], [0]]
+                    self.has_data = False
                 elif button.msg == 'Остановить' or button.msg == 'Stop':
                     self.mode = PAUSED
                 elif button.msg == 'Возобновить' or button.msg == 'Continue':

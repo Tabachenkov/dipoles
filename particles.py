@@ -8,6 +8,7 @@ from copy import deepcopy
 
 EPS = 1e-20
 K = 9e9 * 1e1
+MIN_DIST = 20
 
 class DipoleState(Enum):
     NORMAL = 1
@@ -114,6 +115,7 @@ class ParticleSystem:
                 actangle += math.pi
             self.dipoles[i] = Dipole(pos, self.r, actangle)
 
+        MIN_DIST = self.r
         self.full = self.get_full_potential()
         self.full_p = self.count * self.m * ((self.avg_vel) ** 2) / 2
         self.prev_charge = self.charge
@@ -125,51 +127,52 @@ class ParticleSystem:
             return 0
         return np.sqrt(self.entities[:, 2] ** 2 + self.entities[:, 3] ** 2).mean()
     
-    def update_dipole_pair(self, dt):
-        # Рассчитываем текущее расстояние между двумя диполями
-        pairs = [(0, 2), (0, 3), (1, 2), (1, 3)]
-        r_sizes = []
-        for pair in pairs:
-            if pair[0] % 2 == 0:
-                pos0 = self.dipoles[pair[0] // 2].pos + self.r * np.array([math.cos(self.dipoles[pair[0] // 2].actangle), math.sin(self.dipoles[pair[0] // 2].actangle)])
-            else:
-                pos0 = self.dipoles[pair[0] // 2].pos - self.r * np.array([math.cos(self.dipoles[pair[0] // 2].actangle), math.sin(self.dipoles[pair[0] // 2].actangle)])
-            if pair[1] % 2 == 0:
-                pos1 = self.dipoles[pair[1] // 2].pos + self.r * np.array([math.cos(self.dipoles[pair[1] // 2].actangle), math.sin(self.dipoles[pair[1] // 2].actangle)])
-            else:
-                pos1 = self.dipoles[pair[1] // 2].pos - self.r * np.array([math.cos(self.dipoles[pair[1] // 2].actangle), math.sin(self.dipoles[pair[1] // 2].actangle)])
-            r = pos0 - pos1
-            r_size = np.sqrt(r[0] ** 2 + r[1] ** 2).item()
-            r_sizes.append(r_size)
-        distance = min(r_sizes)
+    def update_dipole_pair(self, dt, forced=False):
+        if not forced:
+            # Рассчитываем текущее расстояние между двумя диполями
+            pairs = [(0, 2), (0, 3), (1, 2), (1, 3)]
+            r_sizes = []
+            for pair in pairs:
+                if pair[0] % 2 == 0:
+                    pos0 = self.dipoles[pair[0] // 2].pos + self.r * np.array([math.cos(self.dipoles[pair[0] // 2].actangle), math.sin(self.dipoles[pair[0] // 2].actangle)])
+                else:
+                    pos0 = self.dipoles[pair[0] // 2].pos - self.r * np.array([math.cos(self.dipoles[pair[0] // 2].actangle), math.sin(self.dipoles[pair[0] // 2].actangle)])
+                if pair[1] % 2 == 0:
+                    pos1 = self.dipoles[pair[1] // 2].pos + self.r * np.array([math.cos(self.dipoles[pair[1] // 2].actangle), math.sin(self.dipoles[pair[1] // 2].actangle)])
+                else:
+                    pos1 = self.dipoles[pair[1] // 2].pos - self.r * np.array([math.cos(self.dipoles[pair[1] // 2].actangle), math.sin(self.dipoles[pair[1] // 2].actangle)])
+                r = pos0 - pos1
+                r_size = np.sqrt(r[0] ** 2 + r[1] ** 2).item()
+                r_sizes.append(r_size)
+            distance = min(r_sizes)
 
-        # Условие для слипания: если диполи достаточно близко и оба в состоянии NORMAL
-        if distance <= 2 * self.r and self.dipoles[0].state == DipoleState.NORMAL and self.dipoles[1].state == DipoleState.NORMAL:
-            # Переключаем оба диполя на состояние STUCK
-            self.dipoles[0].state = DipoleState.STUCK
-            self.dipoles[1].state = DipoleState.STUCK
+            # Условие для слипания: если диполи достаточно близко и оба в состоянии NORMAL
+            if distance <= MIN_DIST and self.dipoles[0].state == DipoleState.NORMAL and self.dipoles[1].state == DipoleState.NORMAL:
+                # Переключаем оба диполя на состояние STUCK
+                self.dipoles[0].state = DipoleState.STUCK
+                self.dipoles[1].state = DipoleState.STUCK
 
-            # Вычисляем общую скорость и угловую скорость для движения как единого объекта
-            center_velocity = (self.dipoles[0].c_vel + self.dipoles[1].c_vel) / 2
-            self.dipoles[0].c_vel = center_velocity 
-            self.dipoles[1].c_vel = center_velocity  # Присваиваем общую скорость
-            angular_velocity = (self.dipoles[0].w + self.dipoles[1].w) / 2
-            self.dipoles[0].w = angular_velocity
-            self.dipoles[1].w = angular_velocity  # Присваиваем общую угловую скорость
-
-        # Условие для разлипания: если слипшиеся диполи разошлись дальше порога разлипания
-        elif self.dipoles[0].state == DipoleState.STUCK and self.dipoles[1].state == DipoleState.STUCK:
-            if distance > 2 * self.r:
-                # Переключаем оба диполя обратно на состояние NORMAL
-                self.dipoles[0].state = DipoleState.NORMAL
-                self.dipoles[1].state = DipoleState.NORMAL
-            else:
+                # Вычисляем общую скорость и угловую скорость для движения как единого объекта
                 center_velocity = (self.dipoles[0].c_vel + self.dipoles[1].c_vel) / 2
                 self.dipoles[0].c_vel = center_velocity 
                 self.dipoles[1].c_vel = center_velocity  # Присваиваем общую скорость
                 angular_velocity = (self.dipoles[0].w + self.dipoles[1].w) / 2
                 self.dipoles[0].w = angular_velocity
                 self.dipoles[1].w = angular_velocity  # Присваиваем общую угловую скорость
+
+            # Условие для разлипания: если слипшиеся диполи разошлись дальше порога разлипания
+            elif self.dipoles[0].state == DipoleState.STUCK and self.dipoles[1].state == DipoleState.STUCK:
+                if distance > MIN_DIST:
+                    # Переключаем оба диполя обратно на состояние NORMAL
+                    self.dipoles[0].state = DipoleState.NORMAL
+                    self.dipoles[1].state = DipoleState.NORMAL
+                else:
+                    center_velocity = (self.dipoles[0].c_vel + self.dipoles[1].c_vel) / 2
+                    self.dipoles[0].c_vel = center_velocity 
+                    self.dipoles[1].c_vel = center_velocity  # Присваиваем общую скорость
+                    angular_velocity = (self.dipoles[0].w + self.dipoles[1].w) / 2
+                    self.dipoles[0].w = angular_velocity
+                    self.dipoles[1].w = angular_velocity  # Присваиваем общую угловую скорость
                 
         if self.dipoles[0].state == DipoleState.NORMAL:
             self.runge_knuta_4(dt)
@@ -271,12 +274,17 @@ class ParticleSystem:
 
     
     def proceed(self, dt: float):
+        forced = False
         if self.prev_charge != self.charge or self.prev_m != self.m or self.prev_charge_mass != self.charge_mass:
             self.full = self.get_full_potential() + self.get_full_kinetic()
             self.full_p = self.get_full_particles_energy()
             self.prev_charge = self.charge
             self.prev_charge_mass = self.charge_mass
             self.prev_m = self.m
+        if self.charge == 0:
+            self.dipoles[0].state = DipoleState.NORMAL
+            self.dipoles[1].state = DipoleState.NORMAL
+            forced = True
         if self.count > 0:
             self.entities[:, 0] += self.entities[:, 2] * dt
             self.entities[:, 1] += self.entities[:, 3] * dt
@@ -402,7 +410,7 @@ class ParticleSystem:
                 temp[:, 1] *= scalar_dot
                 arr[mask, 2:4] -= temp
                 self.entities[i, 2:4] += np.sum(temp, axis=0)
-        self.update_dipole_pair(dt)
+        self.update_dipole_pair(dt, forced=forced)
         it = 0
         while True:
             it += 1

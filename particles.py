@@ -58,6 +58,8 @@ class ParticleSystem:
     ITERATION: int = 0
     dipoles = [Dipole(), Dipole()]
     prev_charge: float = 0
+    prev_charge_mass: float = 0
+    prev_m: float = 0
 
     def __post_init__(self) -> None:
         '''
@@ -113,7 +115,10 @@ class ParticleSystem:
             self.dipoles[i] = Dipole(pos, self.r, actangle)
 
         self.full = self.get_full_potential()
+        self.full_p = self.count * self.m * ((self.avg_vel) ** 2) / 2
         self.prev_charge = self.charge
+        self.prev_charge_mass = self.charge_mass
+        self.prev_m = self.m
     
     def get_average_speed(self) -> float:
         if self.count == 0:
@@ -213,8 +218,13 @@ class ParticleSystem:
         r_size = np.linalg.norm(r).item()
         return K * ((p1 @ p2) * (r_size ** 2) - 3 * (p1 @ r) * (p2 @ r)) / ((r_size + self.r) ** 5)
     
+    def get_full_particles_energy(self):
+        if self.count == 0:
+            return 0
+        return self.m * np.sum(self.entities[:, 2] ** 2 + self.entities[:, 3] ** 2) / 2
+    
     def get_full_energy(self):
-        return self.get_full_kinetic() + self.get_full_potential()
+        return self.get_full_kinetic() + self.get_full_potential() + self.get_full_particles_energy()
     
     def force(self, q1, q2, r):
         return K * q1 * q2 * r / (np.linalg.norm(r).item() + self.r) ** 3
@@ -261,9 +271,12 @@ class ParticleSystem:
 
     
     def proceed(self, dt: float):
-        if self.prev_charge != self.charge:
-            self.full *= (self.charge / self.prev_charge) ** 2
+        if self.prev_charge != self.charge or self.prev_m != self.m or self.prev_charge_mass != self.charge_mass:
+            self.full = self.get_full_potential() + self.get_full_kinetic()
+            self.full_p = self.get_full_particles_energy()
             self.prev_charge = self.charge
+            self.prev_charge_mass = self.charge_mass
+            self.prev_m = self.m
         if self.count > 0:
             self.entities[:, 0] += self.entities[:, 2] * dt
             self.entities[:, 1] += self.entities[:, 3] * dt
@@ -294,21 +307,41 @@ class ParticleSystem:
                     self.dipoles[i].c_vel[0] = abs(self.dipoles[i].c_vel[0])
                     if w_vel[0] < 0:
                         self.dipoles[i].w *= -1
+                    if self.dipoles[i].state == DipoleState.STUCK:
+                        self.dipoles[1 - i].pos[0] -= q[0]
+                        self.dipoles[1 - i].c_vel[0] = abs(self.dipoles[1 - i].c_vel[0])
+                        if w_vel[0] < 0:
+                            self.dipoles[1 - i].w *= -1
                 if q[0] > self.max_width:
                     self.dipoles[i].pos[0] += self.max_width - q[0]
                     self.dipoles[i].c_vel[0] = -abs(self.dipoles[i].c_vel[0])
                     if w_vel[0] > 0:
                         self.dipoles[i].w *= -1
+                    if self.dipoles[i].state == DipoleState.STUCK:
+                        self.dipoles[1 - i].pos[0] += self.max_width - q[0]
+                        self.dipoles[1 - i].c_vel[0] = -abs(self.dipoles[1 - i].c_vel[0])
+                        if w_vel[0] > 0:
+                            self.dipoles[1 - i].w *= -1
                 if q[1] < 0:
                     self.dipoles[i].pos[1] -= q[1]
                     self.dipoles[i].c_vel[1] = abs(self.dipoles[i].c_vel[1])
                     if w_vel[1] < 0:
                         self.dipoles[i].w *= -1
+                    if self.dipoles[i].state == DipoleState.STUCK:
+                        self.dipoles[1 - i].pos[1] -= q[1]
+                        self.dipoles[1 - i].c_vel[1] = abs(self.dipoles[1 - i].c_vel[1])
+                        if w_vel[1] < 0:
+                            self.dipoles[1 - i].w *= -1
                 if q[1] > self.max_height:
                     self.dipoles[i].pos[1] += self.max_height - q[1]
                     self.dipoles[i].c_vel[1] = -abs(self.dipoles[i].c_vel[1])
                     if w_vel[1] > 0:
                         self.dipoles[i].w *= -1
+                    if self.dipoles[i].state == DipoleState.STUCK:
+                        self.dipoles[1 - i].pos[1] += self.max_height - q[1]
+                        self.dipoles[1 - i].c_vel[1] = -abs(self.dipoles[1 - i].c_vel[1])
+                        if w_vel[1] > 0:
+                            self.dipoles[1 - i].w *= -1
 
         if self.count > 0:
             for i in range(4):
@@ -338,13 +371,17 @@ class ParticleSystem:
                     temp[:, 1] *= scalar_dot
                     arr[mask, 2:4] -= (temp / self.m)
                     delta_v = np.sum(temp, axis=0) / self.charge_mass
-                    proj = np.sum(np.array([-sin, cos]) * delta_v)
                     self.dipoles[i // 2].c_vel += delta_v / 2
+                    L = np.cross(pos - self.dipoles[i // 2].pos, self.charge_mass * delta_v)
+                    I = self.charge_mass * ((2 * (self.d_radius ** 2) / 5) + (1 * (self.r ** 2)))
+                    self.dipoles[i // 2].w += L / I
+                    '''
+                    proj = np.sum(np.array([-sin, cos]) * delta_v)
                     if i % 2 == 0:
                         self.dipoles[i // 2].w += proj / (3 * (self.r + 1))
                     else:
                         self.dipoles[i // 2].w -= proj / (3 * (self.r + 1))
-
+                    '''
             for i in range(self.count):
                 arr = self.entities[i+1:]
                 mask = (arr[:, 0] - self.entities[i, 0]) ** 2 + (arr[:, 1] - self.entities[i, 1]) ** 2 < ((2 * self.radius) ** 2)
@@ -369,18 +406,30 @@ class ParticleSystem:
         it = 0
         while True:
             it += 1
-            kin_est = self.full - self.get_full_potential()
-            try:
-                coef = math.sqrt(kin_est / self.get_full_kinetic())
-            except:
-                print(kin_est)
-                assert False
-            for i in range(2):
-                self.dipoles[i].c_vel *= coef
-                self.dipoles[i].w *= coef
+            '''
+            print(self.full)
+            print(self.full_p)
+            print(self.get_full_potential())
+            print(self.get_full_kinetic())
+            print(self.get_full_particles_energy())
+            print('#')
+            '''
+            kin_est = (self.full + self.full_p)- self.get_full_potential()
+            if self.charge > 0 or self.count > 0:
+                try:
+                    coef = math.sqrt(kin_est / (self.get_full_kinetic() + self.get_full_particles_energy()))
+                    #print(coef)
+                except:
+                    print(kin_est)
+                    assert False
+                for i in range(2):
+                    self.dipoles[i].c_vel *= coef
+                    self.dipoles[i].w *= coef
+                if self.count > 0:
+                    self.entities[:, 2:] *= coef
             if abs(kin_est - self.get_full_kinetic()) < EPS or it == 5:
                 break
-
+        #print('#')
         if self.dipoles[0].state == DipoleState.NORMAL:
             center = None
         else:

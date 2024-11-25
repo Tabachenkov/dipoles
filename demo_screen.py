@@ -59,7 +59,7 @@ class DemoScreen():
         self.textbox = TextBox(self.screen, 1700, 70, 60, 30, fontSize=20)
         self.particles_number = 1000
         self.speed = 500
-        self.slider_s = Slider(self.screen, x=1600, y=150, width=250, height=10, min=1, max=1000, initial=500, step=1)
+        self.slider_s = Slider(self.screen, x=1600, y=150, width=250, height=10, min=1, max=100000, initial=50000, step=1)
         self.textbox_s = TextBox(self.screen, 1700, 170, 60, 30, fontSize=20)
         self.slider_radius = Slider(self.screen, x=1600, y=350, width=250, height=10, min=1, max=10, initial=1, step=1)
         self.textbox_radius = TextBox(self.screen, 1700, 370, 60, 30, fontSize=20)
@@ -71,7 +71,7 @@ class DemoScreen():
         self.textbox_d_radius = TextBox(self.screen, 1700, 670, 60, 30, fontSize=20)
         self.slider_r = Slider(self.screen, x=1600, y=750, width=250, height=10, min=15 * 2, max=100 * 2, initial=15 * 2, step=2)
         self.textbox_r = TextBox(self.screen, 1700, 770, 60, 30, fontSize=20)
-        self.slider_charge = Slider(self.screen, x=1600, y=850, width=250, height=10, min=1, max=10, initial=1, step=1)
+        self.slider_charge = Slider(self.screen, x=1600, y=850, width=250, height=10, min=0, max=10, initial=1, step=1)
         self.textbox_charge = TextBox(self.screen, 1700, 870, 60, 30, fontSize=20)
         self.slider_charge_mass = Slider(self.screen, x=1600, y=950, width=250, height=10, min=1, max=50, initial=1, step=1)
         self.textbox_charge_mass = TextBox(self.screen, 1700, 970, 60, 30, fontSize=20)
@@ -221,7 +221,7 @@ class DemoScreen():
                 fig.canvas.draw()
                 self.screen.blit(fig, (0, 500))
                 plt.close()
-                self.particle_system.set_average_speed(self.speed * self.scale0)
+                #self.particle_system.set_average_speed(self.speed * self.scale0)
                 if self.particle_system.count > 0:
                     for particle in self.particle_system.entities:
                         pygame_draw_filled_circle(
@@ -356,7 +356,8 @@ class DemoScreen():
         self.textbox_height.draw()
         self.textbox_d_radius.draw()
         self.textbox_r.draw()
-        self.slider_charge.draw()
+        if self.charge > 0 or self.mode == NOT_STARTED:
+            self.slider_charge.draw()
         self.textbox_charge.draw()
         self.slider_charge_mass.draw()
         self.textbox_charge_mass.draw()

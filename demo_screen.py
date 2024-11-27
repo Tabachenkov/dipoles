@@ -355,8 +355,11 @@ class DemoScreen():
         self.textbox_height.draw()
         self.textbox_d_radius.draw()
         self.textbox_r.draw()
+        '''
         if self.charge > 0 or self.mode == NOT_STARTED:
             self.slider_charge.draw()
+        '''
+        self.slider_charge.draw()
         self.textbox_charge.draw()
         self.slider_charge_mass.draw()
         self.textbox_charge_mass.draw()

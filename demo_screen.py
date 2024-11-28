@@ -2,8 +2,8 @@ import pygame
 import sys
 from button import Button
 import time
-from option_box import OptionBox
-from input_box import InputBox
+# from option_box import OptionBox
+# from input_box import InputBox
 import numpy as np
 from domain import *
 from particles import *
@@ -13,11 +13,6 @@ import pygame_widgets
 from pygame_widgets.textbox import TextBox
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('module://pygame_matplotlib.backend_pygame')
-plt.rcParams["figure.figsize"] = (10, 5)
-plt.rcParams['font.size'] = 10.0
-plt.tight_layout()
-plt.rcParams['lines.linewidth'] = 5.0
 
 NOT_STARTED = 0
 PAUSED = 1
@@ -30,12 +25,18 @@ class DemoScreen():
         self.scale = app.scale
         self.bg_color = (255, 255, 255)
         self.font = 'corbel'
-        self.little_font = pygame.font.SysFont(self.font, int(30 * self.app.scale))
-        self.middle_font = pygame.font.SysFont(self.font, int(40 * self.app.scale), bold=True)
-        self.big_font = pygame.font.SysFont(self.font, int(50 * self.app.scale))
+        self.little_font = pygame.font.SysFont(self.font, int(30 * self.app.scale[1]))
+        self.middle_font = pygame.font.SysFont(self.font, int(40 * self.app.scale[1]), bold=True)
+        self.big_font = pygame.font.SysFont(self.font, int(50 * self.app.scale[1]))
         self.buttons = [Button(self.app, "Начать" if self.app.russian else "Start", (1000, 800), (250, 70), font_size=30),
                         Button(self.app, "Назад" if self.app.russian else "Back", (1000, 900), (250, 70), font_size=30),
                         Button(self.app, "RUS/ENG", (1300, 900), (250, 70), font_size=30)]
+        matplotlib.use('module://pygame_matplotlib.backend_pygame')
+        plt.rcParams["figure.figsize"] = (10 * self.scale[0], 5 * self.scale[1])
+        plt.rcParams['figure.dpi'] = 100.0
+        plt.rcParams['font.size'] = 10.0 * self.scale[1]
+        plt.tight_layout()
+        plt.rcParams['lines.linewidth'] = 5.0 * self.scale[1]
 
         self.dipole_colors = [Color.GOLD, Color.GREEN]
         self.plot_colors = ['gold', 'green', 'purple', 'brown']
@@ -49,34 +50,33 @@ class DemoScreen():
         self.charge = 1
         self.charge_mass = 1
         self.m = 1
-        self.scale0 = 1
 
-        pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width * self.scale, self.height * self.scale), 0)
-        pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width * self.scale, self.height * self.scale), 1)
+        pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width * self.scale[0], self.height * self.scale[1]), 0)
+        pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width * self.scale[0], self.height * self.scale[1]), 1)
 
         self.mode = NOT_STARTED
-        self.slider = Slider(self.screen, x=int(1600 * self.scale), y=int(50 * self.scale), width=int(250 * self.scale), height=int(10 * self.scale), min=0, max=2000, initial=0, step=1)
-        self.textbox = TextBox(self.screen, int(1700 * self.scale), int(70 * self.scale), int(60 * self.scale), int(30 * self.scale), fontSize=20)
+        self.slider = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(50 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=0, max=2000, initial=0, step=1)
+        self.textbox = TextBox(self.screen, int(1700 * self.scale[0]), int(70 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
         self.particles_number = 1000
         self.speed = 500
-        self.slider_s = Slider(self.screen, x=int(1600 * self.scale), y=int(150 * self.scale), width=int(250 * self.scale), height=int(10 * self.scale), min=1, max=100000, initial=50000, step=1)
-        self.textbox_s = TextBox(self.screen, int(1700 * self.scale), int(170 * self.scale), int(60 * self.scale), int(30 * self.scale), fontSize=20)
-        self.slider_radius = Slider(self.screen, x=int(1600 * self.scale), y=int(350 * self.scale), width=int(250 * self.scale), height=int(10 * self.scale), min=1, max=10, initial=1, step=1)
-        self.textbox_radius = TextBox(self.screen, int(1700 * self.scale), int(370 * self.scale), int(60 * self.scale), int(30 * self.scale), fontSize=20)
-        self.slider_width = Slider(self.screen, x=int(1600 * self.scale), y=int(450 * self.scale), width=int(250 * self.scale), height=int(10 * self.scale), min=300, max=1500, initial=1500, step=100)
-        self.textbox_width = TextBox(self.screen, int(1700 * self.scale), int(470 * self.scale), int(60 * self.scale), int(30 * self.scale), fontSize=20)
-        self.slider_height = Slider(self.screen, x=int(1600 * self.scale), y=int(550 * self.scale), width=int(250 * self.scale), height=int(10 * self.scale), min=300, max=500, initial=500, step=100)
-        self.textbox_height = TextBox(self.screen, int(1700 * self.scale), int(570 * self.scale), int(60 * self.scale), int(30 * self.scale), fontSize=20)
-        self.slider_d_radius = Slider(self.screen, x=int(1600 * self.scale), y=int(650 * self.scale), width=int(250 * self.scale), height=int(10 * self.scale), min=1, max=15, initial=5, step=1)
-        self.textbox_d_radius = TextBox(self.screen, int(1700 * self.scale), int(670 * self.scale), int(60 * self.scale), int(30 * self.scale), fontSize=20)
-        self.slider_r = Slider(self.screen, x=int(1600 * self.scale), y=int(750 * self.scale), width=int(250 * self.scale), height=int(10 * self.scale), min=15 * 2, max=100 * 2, initial=15 * 2, step=2)
-        self.textbox_r = TextBox(self.screen, int(1700 * self.scale), int(770 * self.scale), int(60 * self.scale), int(30 * self.scale), fontSize=20)
-        self.slider_charge = Slider(self.screen, x=int(1600 * self.scale), y=int(850 * self.scale), width=int(250 * self.scale), height=int(10 * self.scale), min=0, max=10, initial=1, step=1)
-        self.textbox_charge = TextBox(self.screen, int(1700 * self.scale), int(870 * self.scale), int(60 * self.scale), int(30 * self.scale), fontSize=20)
-        self.slider_charge_mass = Slider(self.screen, x=int(1600 * self.scale), y=int(950 * self.scale), width=int(250 * self.scale), height=int(10 * self.scale), min=1, max=50, initial=1, step=1)
-        self.textbox_charge_mass = TextBox(self.screen, int(1700 * self.scale), int(970 * self.scale), int(60 * self.scale), int(30 * self.scale), fontSize=20)
-        self.slider_m = Slider(self.screen, x=int(1600 * self.scale), y=int(250 * self.scale), width=int(250 * self.scale), height=int(10 * self.scale), min=1, max=50, initial=1, step=1)
-        self.textbox_m = TextBox(self.screen, int(1700 * self.scale), int(270 * self.scale), int(60 * self.scale), int(30 * self.scale), fontSize=20)
+        self.slider_s = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(150 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=100000, initial=50000, step=1)
+        self.textbox_s = TextBox(self.screen, int(1700 * self.scale[0]), int(170 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
+        self.slider_radius = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(350 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=10, initial=1, step=1)
+        self.textbox_radius = TextBox(self.screen, int(1700 * self.scale[0]), int(370 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
+        self.slider_width = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(450 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=300, max=1500, initial=1500, step=100)
+        self.textbox_width = TextBox(self.screen, int(1700 * self.scale[0]), int(470 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
+        self.slider_height = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(550 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=300, max=500, initial=500, step=100)
+        self.textbox_height = TextBox(self.screen, int(1700 * self.scale[0]), int(570 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
+        self.slider_d_radius = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(650 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=15, initial=5, step=1)
+        self.textbox_d_radius = TextBox(self.screen, int(1700 * self.scale[0]), int(670 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
+        self.slider_r = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(750 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=15 * 2, max=100 * 2, initial=15 * 2, step=2)
+        self.textbox_r = TextBox(self.screen, int(1700 * self.scale[0]), int(770 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
+        self.slider_charge = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(850 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=0, max=10, initial=1, step=1)
+        self.textbox_charge = TextBox(self.screen, int(1700 * self.scale[0]), int(870 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
+        self.slider_charge_mass = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(950 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=50, initial=1, step=1)
+        self.textbox_charge_mass = TextBox(self.screen, int(1700 * self.scale[0]), int(970 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
+        self.slider_m = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(250 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=50, initial=1, step=1)
+        self.textbox_m = TextBox(self.screen, int(1700 * self.scale[0]), int(270 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
 
         self.strings = ["Количество частиц", "Средняя скорость частиц", "Масса частицы", 
         "Радиус частицы", "Ширина", "Высота", "Радиус заряда", "Расстояние между зарядами", "Величина заряда",
@@ -99,7 +99,7 @@ class DemoScreen():
 
         self.particle_system = ParticleSystem(self.particles_number, self.radius, max_width=self.width, max_height=self.height, 
                                                           avg_vel=self.speed, d_radius=self.d_radius, r=self.r / 2, 
-                                                          charge=self.charge, charge_mass=self.charge_mass, m=self.m, scale=self.scale0)
+                                                          charge=self.charge, charge_mass=self.charge_mass, m=self.m)
 
     def _check_events(self):
         events = pygame.event.get()
@@ -182,14 +182,14 @@ class DemoScreen():
         for index, string in enumerate(self.strings if self.app.russian else self.eng_strings):
             self.strings_surfaces.append(self.little_font.render(string, False, (0, 0, 0)))
         for index, surface in enumerate(self.strings_surfaces):
-            self.screen.blit(surface, np.array(self.positions[index] if self.app.russian else self.eng_positions[index]) * self.scale)
+            self.screen.blit(surface, np.array(self.positions[index] if self.app.russian else self.eng_positions[index]) * np.array(self.scale))
         if self.mode == ACTIVATED:
             self.buttons = [Button(self.app, "Завершить" if self.app.russian else "Finish", (1000, 800), (250, 70), font_size=30),
                             Button(self.app, "Остановить" if self.app.russian else "Stop", (1300, 800), (250, 70), font_size=30),
                             Button(self.app, "Назад" if self.app.russian else "Back", (1000, 900), (250, 70), font_size=30),
                             Button(self.app, "RUS/ENG", (1300, 900), (250, 70), font_size=30)]
-            pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width * self.scale, self.height * self.scale), 0)
-            pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width * self.scale, self.height * self.scale), 1)
+            pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width * self.scale[0], self.height * self.scale[1]), 0)
+            pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width * self.scale[0], self.height * self.scale[1]), 1)
             try:
                 res = self.particle_system.proceed(self.dt)
                 self.data[0].append(res[0].item())
@@ -213,23 +213,21 @@ class DemoScreen():
                 axes.set_title("Энергии диполей" if self.app.russian else "Dipoles' energies", fontsize=15)
                 axes.set_xlim(xmin=self.times[0])
                 axes.set_ylim(ymin=min(self.data[2] + self.data[0] + self.data[1]))
-                #axes.set_yscale('symlog')
                 plt.legend(['диполь 1 (кин.)', 'диполь 2 (кин.)', 'Потенц.', 'Полная'] if self.app.russian 
                             else ['dipole 1 (kin)', 'dipole 2 (kin)', 'Poten.', 'Full'], loc='upper left', fontsize=15)
                 axes.grid()
                 fig.canvas.draw()
-                self.screen.blit(fig, (0, int(500 * self.scale)))
+                self.screen.blit(fig, (0, int(500 * self.scale[1])))
                 plt.close()
-                #self.particle_system.set_average_speed(self.speed * self.scale0)
                 if self.particle_system.count > 0:
                     for particle in self.particle_system.entities:
                         pygame_draw_filled_circle(
                             surface=self.screen,
                             pos=Position(
-                                x=int(particle[0] / self.scale0 * self.scale),
-                                y=int(particle[1] / self.scale0 * self.scale)
+                                x=int(particle[0] / self.scale[0]),
+                                y=int(particle[1] / self.scale[1])
                             ),
-                            radius=int(self.particle_system.radius / self.scale0 * self.scale),
+                            radius=int(self.particle_system.radius / self.scale[1]),
                             color=self.particle_color
                         )
                 for i in range(2):
@@ -240,23 +238,23 @@ class DemoScreen():
                     pygame_draw_filled_circle(
                         surface=self.screen,
                         pos=Position(
-                            x=int(pos0[0] / self.scale0 * self.scale),
-                            y=int(pos0[1] / self.scale0 * self.scale)
+                            x=int(pos0[0] / self.scale[0]),
+                            y=int(pos0[1] / self.scale[1])
                         ),
-                        radius=int(self.particle_system.d_radius / self.scale0 * self.scale),
+                        radius=int(self.particle_system.d_radius / self.scale[1]),
                         color=Color.BLUE
                     )
                     pygame_draw_filled_circle(
                         surface=self.screen,
                         pos=Position(
-                            x=int(pos1[0] / self.scale0 * self.scale),
-                            y=int(pos1[1] / self.scale0 * self.scale)
+                            x=int(pos1[0] / self.scale[0]),
+                            y=int(pos1[1] / self.scale[1])
                         ),
-                        radius=int(self.particle_system.d_radius / self.scale0 * self.scale),
+                        radius=int(self.particle_system.d_radius / self.scale[1]),
                         color=Color.RED
                     )
-                    pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0] / self.scale0 * self.scale, pos0[1] / self.scale0 * self.scale),
-                                    (pos1[0] / self.scale0 * self.scale, pos1[1] / self.scale0 * self.scale), width=int(5 * self.scale))
+                    pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0] / self.scale[0], pos0[1] / self.scale[1]),
+                                    (pos1[0] / self.scale[0], pos1[1] / self.scale[1]), width=int(5 * self.scale[1]))
             except:
                 self.mode = NOT_STARTED    
         elif self.mode == PAUSED:
@@ -264,8 +262,8 @@ class DemoScreen():
                             Button(self.app, "Возобновить" if self.app.russian else "Continue", (1300, 800), (250, 70), font_size=30),
                             Button(self.app, "Назад" if self.app.russian else "Back", (1000, 900), (250, 70), font_size=30),
                             Button(self.app, "RUS/ENG", (1300, 900), (250, 70), font_size=30)]
-            pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width * self.scale, self.height * self.scale), 0)
-            pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width * self.scale, self.height * self.scale), 1)
+            pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width * self.scale[0], self.height * self.scale[1]), 0)
+            pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width * self.scale[0], self.height * self.scale[1]), 1)
             fig, axes = plt.subplots(1, 1)
             axes.plot(self.times, self.data[0], color=self.plot_colors[0])
             axes.plot(self.times, self.data[1], color=self.plot_colors[1])
@@ -279,17 +277,17 @@ class DemoScreen():
                         else ['dipole 1 (kin)', 'dipole 2 (kin)', 'Poten.', 'Full'], loc='upper left', fontsize=15)
             plt.grid()
             fig.canvas.draw()
-            self.screen.blit(fig, (0, int(500 * self.scale)))
+            self.screen.blit(fig, (0, int(500 * self.scale[1])))
             plt.close()
             if self.particle_system.count > 0:
                 for particle in self.particle_system.entities:
                     pygame_draw_filled_circle(
                         surface=self.screen,
                         pos=Position(
-                            x=int(particle[0] / self.scale0 * self.scale),
-                            y=int(particle[1] / self.scale0 * self.scale)
+                            x=int(particle[0] / self.scale[0]),
+                            y=int(particle[1] / self.scale[1])
                         ),
-                        radius=int(self.particle_system.radius / self.scale0 * self.scale),
+                        radius=int(self.particle_system.radius / self.scale[1]),
                         color=self.particle_color
                     )
             for i in range(2):
@@ -300,29 +298,29 @@ class DemoScreen():
                 pygame_draw_filled_circle(
                     surface=self.screen,
                     pos=Position(
-                        x=int(pos0[0] / self.scale0 * self.scale),
-                        y=int(pos0[1] / self.scale0 * self.scale)
+                        x=int(pos0[0] / self.scale[0]),
+                        y=int(pos0[1] / self.scale[1])
                     ),
-                    radius=int(self.particle_system.d_radius / self.scale0 * self.scale),
+                    radius=int(self.particle_system.d_radius / self.scale[1]),
                     color=Color.BLUE
                 )
                 pygame_draw_filled_circle(
                     surface=self.screen,
                     pos=Position(
-                        x=int(pos1[0] / self.scale0 * self.scale),
-                        y=int(pos1[1] / self.scale0 * self.scale)
+                        x=int(pos1[0] / self.scale[0]),
+                        y=int(pos1[1] / self.scale[1])
                     ),
-                    radius=int(self.particle_system.d_radius / self.scale0 * self.scale),
+                    radius=int(self.particle_system.d_radius / self.scale[1]),
                     color=Color.RED
                 )
-                pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0] / self.scale0 * self.scale, pos0[1] / self.scale0 * self.scale),
-                                (pos1[0] / self.scale0 * self.scale, pos1[1] / self.scale0 * self.scale), width=int(5 * self.scale))
+                pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0] / self.scale[0], pos0[1] / self.scale[1]),
+                                (pos1[0] / self.scale[0], pos1[1] / self.scale[1]), width=int(5 * self.scale[1]))
         else:
             self.buttons = [Button(self.app, "Начать" if self.app.russian else "Start", (1000, 800), (250, 70), font_size=30),
                         Button(self.app, "Назад" if self.app.russian else "Back", (1000, 900), (250, 70), font_size=30),
                         Button(self.app, "RUS/ENG", (1300, 900), (250, 70), font_size=30)]
-            pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width * self.scale, self.height * self.scale), 0)
-            pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width * self.scale, self.height * self.scale), 1)
+            pygame.draw.rect(self.screen, Color.WHITE.rgb, Rectangle(0, 0, self.width * self.scale[0], self.height * self.scale[1]), 0)
+            pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width * self.scale[0], self.height * self.scale[1]), 1)
             fig, axes = plt.subplots(1, 1)
             axes.plot(self.times, self.data[0], color=self.plot_colors[0])
             axes.plot(self.times, self.data[1], color=self.plot_colors[1])
@@ -336,7 +334,7 @@ class DemoScreen():
                         else ['dipole 1 (kin)', 'dipole 2 (kin)', 'Poten.', 'Full'], loc='upper left', fontsize=15)
             plt.grid()
             fig.canvas.draw()
-            self.screen.blit(fig, (0, int(500 * self.scale)))
+            self.screen.blit(fig, (0, int(500 * self.scale[1])))
             plt.close()
         for button in self.buttons:
             button.draw_button()
@@ -375,7 +373,7 @@ class DemoScreen():
                     self.mode = ACTIVATED
                     self.particle_system = ParticleSystem(self.particles_number, self.radius, max_width=self.width, max_height=self.height, 
                                                           avg_vel=self.speed, d_radius=self.d_radius, r=self.r / 2, charge=self.charge, 
-                                                          charge_mass=self.charge_mass, m=self.m, scale=self.scale0)
+                                                          charge_mass=self.charge_mass, m=self.m)
                     self.times = [0]
                     self.data = [[0], [0], [0], [0]]
                     self.has_data = False

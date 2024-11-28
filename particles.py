@@ -55,7 +55,6 @@ class ParticleSystem:
     charge: float
     charge_mass: float
     m: float
-    scale: float
     ITERATION: int = 0
     dipoles = [Dipole(), Dipole()]
     prev_charge: float = 0
@@ -65,14 +64,6 @@ class ParticleSystem:
     dw = [0, 0]
 
     def __post_init__(self) -> None:
-        '''
-        self.radius *= self.scale
-        self.max_width *= self.scale
-        self.max_height *= self.scale
-        self.avg_vel *= self.scale
-        self.d_radius *= self.scale
-        self.r *= self.scale
-        '''
         x_space = np.linspace(self.radius, self.max_width - self.radius, int(self.max_width // (2.5 * self.radius)))
         y_space = np.linspace(self.radius, self.max_height - self.radius, int(self.max_height // (2.5 * self.radius)))
         

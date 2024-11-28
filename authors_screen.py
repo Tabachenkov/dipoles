@@ -10,9 +10,9 @@ class AuthorsScreen():
         self.screen = app.screen
         self.bg_color = (255, 255, 255)
         self.font = 'corbel'
-        self.little_font = pygame.font.SysFont(self.font, int(35 * self.app.scale))
-        self.middle_font = pygame.font.SysFont(self.font, int(40 * self.app.scale), bold=True)
-        self.big_font = pygame.font.SysFont(self.font, int(50  * self.app.scale))
+        self.little_font = pygame.font.SysFont(self.font, int(35 * self.app.scale[1]))
+        self.middle_font = pygame.font.SysFont(self.font, int(40 * self.app.scale[1]), bold=True)
+        self.big_font = pygame.font.SysFont(self.font, int(50  * self.app.scale[1]))
         self.strings = ["Московский Государственный Университет им. М.В. Ломоносова",
                         "Факультет вычислительной математики и кибернетики", 
                         "Лектор: Григорьев Кирилл Сергеевич",
@@ -27,23 +27,26 @@ class AuthorsScreen():
                             "Ilyassov Erik"]
         self.russian = app.russian
         
-        self.text_positions = np.array(((400, 100), (500, 150), (670, 850), (600, 790), (395, 720), (1270, 720)))
+        self.text_positions = np.array(((400 * self.scale[0], 100 * self.scale[1]), (500 * self.scale[0], 150 * self.scale[1]), 
+                                        (670 * self.scale[0], 850 * self.scale[1]), (600 * self.scale[0], 790 * self.scale[1]), 
+                                        (395 * self.scale[0], 720 * self.scale[1]), (1270 * self.scale[0], 720 * self.scale[1])))
 
-        self.eng_text_positions = np.array(((650, 100), (500, 150), (720, 850), (710, 790), (395, 720), (1270, 720)))
+        self.eng_text_positions = np.array(((650 * self.scale[0], 100), (500 * self.scale[0], 150), (720 * self.scale[0], 850), 
+                                            (710 * self.scale[0], 790), (395 * self.scale[0], 720), (1270 * self.scale[0], 720)))
         
         self.pictures = [pygame.transform.scale(pygame.image.load("cmc_logo.jpg"), 
-                                                (140 * self.app.scale, 140 * self.app.scale)),
+                                                (140 * self.app.scale[0], 140 * self.app.scale[1])),
                          pygame.transform.scale(pygame.image.load("msu_logo.jpg"), 
-                                                (150 * self.app.scale, 150 * self.app.scale)),
+                                                (150 * self.app.scale[0], 150 * self.app.scale[1])),
                          pygame.transform.scale(pygame.image.load("andrei.jpg"), 
-                                                (400 * self.app.scale, 400 * self.app.scale)),
+                                                (400 * self.app.scale[0], 400 * self.app.scale[1])),
                          pygame.transform.scale(pygame.image.load("eric.jpg"), 
-                                                (400 * self.app.scale, 400 * self.app.scale))]
+                                                (400 * self.app.scale[0], 400 * self.app.scale[1]))]
         
-        self.pictures_positions = [(1600 * self.app.scale, 80 * self.app.scale), 
-                                   (180 * self.app.scale, 80 * self.app.scale), 
-                                   (340 * self.app.scale, 300 * self.app.scale), 
-                                   (1160 * self.app.scale, 300 * self.app.scale)]
+        self.pictures_positions = [(1600 * self.app.scale[0], 80 * self.app.scale[1]), 
+                                   (180 * self.app.scale[0], 80 * self.app.scale[1]), 
+                                   (340 * self.app.scale[0], 300 * self.app.scale[1]), 
+                                   (1160 * self.app.scale[0], 300 * self.app.scale[1])]
         self.buttons = [Button(app, "Назад", (1300, 900), (300, 80)), Button(app, "RUS/ENG", (1710, 900), (170, 70), font_size=30)]
     
     def _update_screen(self):
@@ -57,7 +60,7 @@ class AuthorsScreen():
                 self.strings_surfaces.append(self.little_font.render(string, False, (0, 0, 0)))
 
         for index, surface in enumerate(self.strings_surfaces):
-            self.screen.blit(surface, (self.text_positions[index] if self.app.russian else self.eng_text_positions[index]) * self.scale)
+            self.screen.blit(surface, (self.text_positions[index] if self.app.russian else self.eng_text_positions[index]))
 
         for index, picture in enumerate(self.pictures):
             self.screen.blit(picture, self.pictures_positions[index])

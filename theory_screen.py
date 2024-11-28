@@ -11,9 +11,9 @@ class TheoryScreen():
         self.screen = app.screen
         self.bg_color = (255, 255, 255)
         self.font = 'corbel'
-        self.little_font = pygame.font.SysFont(self.font, int(35 * self.app.scale))
-        self.middle_font = pygame.font.SysFont(self.font, int(50 * self.app.scale), bold=True)
-        self.big_font = pygame.font.SysFont(self.font, int(50  * self.app.scale))
+        self.little_font = pygame.font.SysFont(self.font, int(35 * self.app.scale[1]))
+        self.middle_font = pygame.font.SysFont(self.font, int(50 * self.app.scale[1]), bold=True)
+        self.big_font = pygame.font.SysFont(self.font, int(50  * self.app.scale[1]))
         self.strings = ["Теория к демонстрации"]
         self.eng_strings = ["Theory for demonstration"]
         self.russian = app.russian
@@ -29,11 +29,11 @@ class TheoryScreen():
                                 pygame.transform.scale(pygame.image.load("th5.png"), (908, 596))]
 
         self.active_picture = 0
-        self.pictures_positions = [(1600 * self.app.scale, 80 * self.app.scale), 
-                                   (1600 * self.app.scale, 80 * self.app.scale), 
-                                   (1600 * self.app.scale, 80 * self.app.scale), 
-                                   (1600 * self.app.scale, 80 * self.app.scale),
-                                   (1600 * self.app.scale, 80 * self.app.scale)]
+        self.pictures_positions = [(1600 * self.app.scale[0], 80 * self.app.scale[1]), 
+                                   (1600 * self.app.scale[0], 80 * self.app.scale[1]), 
+                                   (1600 * self.app.scale[0], 80 * self.app.scale[1]), 
+                                   (1600 * self.app.scale[0], 80 * self.app.scale[1]),
+                                   (1600 * self.app.scale[0], 80 * self.app.scale[1])]
         
         self.theory_positions = ((250, 130), (250, 130), (250, 130), (250, 130), (320, 130), (320, 130))
 
@@ -51,11 +51,11 @@ class TheoryScreen():
                 self.strings_surfaces.append(self.little_font.render(string, False, (0, 0, 0)))
 
         for index, surface in enumerate(self.strings_surfaces):
-            self.screen.blit(surface, (self.text_positions[index] if self.app.russian else self.eng_text_positions[index]) * self.scale)
+            self.screen.blit(surface, (self.text_positions[index] if self.app.russian else self.eng_text_positions[index]) * np.array(self.scale))
 
         self.screen.blit(self.little_font.render(f"Страница {self.active_picture + 1} из {len(self.theory_pictures)}" if self.app.russian 
                                                  else f"Page {self.active_picture + 1} of {len(self.theory_pictures)}", 
-                                                 False, (0, 0, 0)), (np.array((870, 950)) if self.app.russian else np.array((900, 950))) * self.scale)
+                                                 False, (0, 0, 0)), (np.array((870, 950)) if self.app.russian else np.array((900, 950))) * np.array(self.scale))
 
         self.screen.blit(self.theory_pictures[self.active_picture], self.theory_positions[self.active_picture])
 

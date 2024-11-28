@@ -12,9 +12,9 @@ class MenuScreen():
         self.screen = app.screen
         self.bg_color = (255, 255, 255)
         self.font = 'corbel'
-        self.little_font = pygame.font.SysFont(self.font, int(35 * self.app.scale))
-        self.middle_font = pygame.font.SysFont(self.font, int(40 * self.app.scale), bold=True)
-        self.big_font = pygame.font.SysFont(self.font, int(50 * self.app.scale))
+        self.little_font = pygame.font.SysFont(self.font, int(35 * self.app.scale[1]))
+        self.middle_font = pygame.font.SysFont(self.font, int(40 * self.app.scale[1]), bold=True)
+        self.big_font = pygame.font.SysFont(self.font, int(50 * self.app.scale[1]))
         self.msu_name = "Московский Государственный Университет им. М.В. Ломоносова"
         self.faculty_name = "Факультет вычислительной математики и кибернетики"
         self.demonstration_label = "Компьютерная демонстрация по курсу"
@@ -28,8 +28,8 @@ class MenuScreen():
                             "in the ideal gas"]
         self.positions = [(400, 100), (500, 150), (700, 250), (800, 300), (730, 400), (810, 470)]
         self.eng_positions = [(650, 100), (500, 150), (700, 250), (830, 300), (790, 400), (830, 470)]
-        self.cmc_logo = pygame.transform.scale(pygame.image.load("cmc_logo.jpg"), np.array((140, 140)) * self.scale)
-        self.msu_logo = pygame.transform.scale(pygame.image.load("msu_logo.jpg"), np.array((150, 150)) * self.scale)
+        self.cmc_logo = pygame.transform.scale(pygame.image.load("cmc_logo.jpg"), np.array((140, 140)) * np.array(self.scale))
+        self.msu_logo = pygame.transform.scale(pygame.image.load("msu_logo.jpg"), np.array((150, 150)) * np.array(self.scale))
         self.buttons = [Button(app, "Демонстрация", (750, 600), (400, 80)), 
                         Button(app, "Теория", (750, 700), (400, 80)),
                         Button(app, "Авторы", (750, 800), (400, 80)), 
@@ -53,9 +53,9 @@ class MenuScreen():
             else:
                 self.strings_surfaces.append(self.big_font.render(string, False, (0, 0, 0)))
         for index, surface in enumerate(self.strings_surfaces):
-            self.screen.blit(surface, np.array(self.positions[index] if self.app.russian else self.eng_positions[index]) * self.scale)
-        self.screen.blit(self.cmc_logo, np.array((1600, 80)) * self.scale)
-        self.screen.blit(self.msu_logo, np.array((180, 80)) * self.scale)
+            self.screen.blit(surface, np.array(self.positions[index] if self.app.russian else self.eng_positions[index]) * np.array(self.scale))
+        self.screen.blit(self.cmc_logo, np.array((1600, 80)) * np.array(self.scale))
+        self.screen.blit(self.msu_logo, np.array((180, 80)) * np.array(self.scale))
         for button in self.buttons:
             button.draw_button()
         

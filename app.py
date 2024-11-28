@@ -19,8 +19,8 @@ if sys.platform == "win32":
 class App:
     def __init__(self) -> None:
         pygame.init()
-        self.scale = pygame.display.Info().current_w / 1920
-        self.screen = pygame.display.set_mode((1920 * self.scale, 1080 * self.scale))
+        self.scale = [pygame.display.Info().current_w / 1920, pygame.display.Info().current_h / 1080]
+        self.screen = pygame.display.set_mode((1920 * self.scale[0], 1080 * self.scale[1]))
         self.russian = True
         self.menu_screen = MenuScreen(self)
         self.authors_screen = AuthorsScreen(self)

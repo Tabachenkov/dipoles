@@ -224,10 +224,10 @@ class DemoScreen():
                         pygame_draw_filled_circle(
                             surface=self.screen,
                             pos=Position(
-                                x=int(particle[0] / self.scale[0]),
-                                y=int(particle[1] / self.scale[1])
+                                x=int(particle[0] * self.scale[0]),
+                                y=int(particle[1] * self.scale[1])
                             ),
-                            radius=int(self.particle_system.radius / self.scale[1]),
+                            radius=int(self.particle_system.radius * self.scale[1]),
                             color=self.particle_color
                         )
                 for i in range(2):
@@ -238,23 +238,23 @@ class DemoScreen():
                     pygame_draw_filled_circle(
                         surface=self.screen,
                         pos=Position(
-                            x=int(pos0[0] / self.scale[0]),
-                            y=int(pos0[1] / self.scale[1])
+                            x=int(pos0[0] * self.scale[0]),
+                            y=int(pos0[1] * self.scale[1])
                         ),
-                        radius=int(self.particle_system.d_radius / self.scale[1]),
+                        radius=int(self.particle_system.d_radius * self.scale[1]),
                         color=Color.BLUE
                     )
                     pygame_draw_filled_circle(
                         surface=self.screen,
                         pos=Position(
-                            x=int(pos1[0] / self.scale[0]),
-                            y=int(pos1[1] / self.scale[1])
+                            x=int(pos1[0] * self.scale[0]),
+                            y=int(pos1[1] * self.scale[1])
                         ),
-                        radius=int(self.particle_system.d_radius / self.scale[1]),
+                        radius=int(self.particle_system.d_radius * self.scale[1]),
                         color=Color.RED
                     )
-                    pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0] / self.scale[0], pos0[1] / self.scale[1]),
-                                    (pos1[0] / self.scale[0], pos1[1] / self.scale[1]), width=int(5 * self.scale[1]))
+                    pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0] * self.scale[0], pos0[1] * self.scale[1]),
+                                    (pos1[0] * self.scale[0], pos1[1] * self.scale[1]), width=int(5 * self.scale[1]))
             except:
                 self.mode = NOT_STARTED    
         elif self.mode == PAUSED:
@@ -284,10 +284,10 @@ class DemoScreen():
                     pygame_draw_filled_circle(
                         surface=self.screen,
                         pos=Position(
-                            x=int(particle[0] / self.scale[0]),
-                            y=int(particle[1] / self.scale[1])
+                            x=int(particle[0] * self.scale[0]),
+                            y=int(particle[1] * self.scale[1])
                         ),
-                        radius=int(self.particle_system.radius / self.scale[1]),
+                        radius=int(self.particle_system.radius * self.scale[1]),
                         color=self.particle_color
                     )
             for i in range(2):
@@ -298,23 +298,23 @@ class DemoScreen():
                 pygame_draw_filled_circle(
                     surface=self.screen,
                     pos=Position(
-                        x=int(pos0[0] / self.scale[0]),
-                        y=int(pos0[1] / self.scale[1])
+                        x=int(pos0[0] * self.scale[0]),
+                        y=int(pos0[1] * self.scale[1])
                     ),
-                    radius=int(self.particle_system.d_radius / self.scale[1]),
+                    radius=int(self.particle_system.d_radius * self.scale[1]),
                     color=Color.BLUE
                 )
                 pygame_draw_filled_circle(
                     surface=self.screen,
                     pos=Position(
-                        x=int(pos1[0] / self.scale[0]),
-                        y=int(pos1[1] / self.scale[1])
+                        x=int(pos1[0] * self.scale[0]),
+                        y=int(pos1[1] * self.scale[1])
                     ),
-                    radius=int(self.particle_system.d_radius / self.scale[1]),
+                    radius=int(self.particle_system.d_radius * self.scale[1]),
                     color=Color.RED
                 )
-                pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0] / self.scale[0], pos0[1] / self.scale[1]),
-                                (pos1[0] / self.scale[0], pos1[1] / self.scale[1]), width=int(5 * self.scale[1]))
+                pygame.draw.line(self.screen, self.dipole_colors[i], (pos0[0] * self.scale[0], pos0[1] * self.scale[1]),
+                                (pos1[0] * self.scale[0], pos1[1] * self.scale[1]), width=int(5 * self.scale[1]))
         else:
             self.buttons = [Button(self.app, "Начать" if self.app.russian else "Start", (1000, 800), (250, 70), font_size=30),
                         Button(self.app, "Назад" if self.app.russian else "Back", (1000, 900), (250, 70), font_size=30),

@@ -5,6 +5,18 @@ import webbrowser
 import numpy as np
 from authors_screen import AuthorsScreen
 from demo_screen import DemoScreen
+
+
+import os
+
+# Получить путь к ресурсу
+def resource_path(relative_path):
+    """ Получить путь к ресурсам, поддерживается работа из .exe """
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
+
 class MenuScreen():
     def __init__(self, app):
         self.app = app
@@ -28,8 +40,8 @@ class MenuScreen():
                             "in the ideal gas"]
         self.positions = [(400, 100), (500, 150), (700, 250), (800, 300), (730, 400), (810, 470)]
         self.eng_positions = [(650, 100), (500, 150), (700, 250), (830, 300), (790, 400), (830, 470)]
-        self.cmc_logo = pygame.transform.scale(pygame.image.load("cmc_logo.jpg"), np.array((140, 140)) * np.array(self.scale))
-        self.msu_logo = pygame.transform.scale(pygame.image.load("msu_logo.jpg"), np.array((150, 150)) * np.array(self.scale))
+        self.cmc_logo = pygame.transform.scale(pygame.image.load(resource_path("pictures/cmc_logo.jpg")), np.array((140, 140)) * np.array(self.scale))
+        self.msu_logo = pygame.transform.scale(pygame.image.load(resource_path("pictures/msu_logo.jpg")), np.array((150, 150)) * np.array(self.scale))
         self.buttons = [Button(app, "Демонстрация", (750, 600), (400, 80)), 
                         Button(app, "Теория", (750, 700), (400, 80)),
                         Button(app, "Авторы", (750, 800), (400, 80)), 

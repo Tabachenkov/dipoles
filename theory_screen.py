@@ -4,6 +4,17 @@ from button import Button
 import numpy as np
 from demo_screen import DemoScreen
 
+import os
+
+# Получить путь к ресурсу
+def resource_path(relative_path):
+    """ Получить путь к ресурсам, поддерживается работа из .exe """
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
+
+
 class TheoryScreen():
     def __init__(self, app):
         self.app = app
@@ -22,11 +33,11 @@ class TheoryScreen():
 
         self.eng_text_positions = np.array(((700, 50),))
         
-        self.theory_pictures = [pygame.transform.scale(pygame.image.load("th1.png"), (908, 596)),
-                                pygame.transform.scale(pygame.image.load("th2.png"), (908, 596)),
-                                pygame.transform.scale(pygame.image.load("th3.png"), (908, 596)),
-                                pygame.transform.scale(pygame.image.load("th4.png"), (908, 596)),
-                                pygame.transform.scale(pygame.image.load("th5.png"), (908, 596))]
+        self.theory_pictures = [pygame.transform.scale(pygame.image.load(resource_path("pictures/th1.png")), (908, 596)),
+                                pygame.transform.scale(pygame.image.load(resource_path("pictures/th2.png")), (908, 596)),
+                                pygame.transform.scale(pygame.image.load(resource_path("pictures/th3.png")), (908, 596)),
+                                pygame.transform.scale(pygame.image.load(resource_path("pictures/th4.png")), (908, 596)),
+                                pygame.transform.scale(pygame.image.load(resource_path("pictures/th5.png")), (908, 596))]
 
         self.active_picture = 0
         self.pictures_positions = [(1600 * self.app.scale[0], 80 * self.app.scale[1]), 

@@ -3,6 +3,16 @@ import sys
 from button import Button
 import numpy as np
 from demo_screen import DemoScreen
+
+import os
+
+def resource_path(relative_path):
+    """ Получить путь к ресурсам, поддерживается работа из .exe """
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
+
 class AuthorsScreen():
     def __init__(self, app):
         self.app = app
@@ -34,13 +44,13 @@ class AuthorsScreen():
         self.eng_text_positions = np.array(((650 * self.scale[0], 100), (500 * self.scale[0], 150), (720 * self.scale[0], 850), 
                                             (710 * self.scale[0], 790), (395 * self.scale[0], 720), (1270 * self.scale[0], 720)))
         
-        self.pictures = [pygame.transform.scale(pygame.image.load("cmc_logo.jpg"), 
+        self.pictures = [pygame.transform.scale(pygame.image.load(resource_path("pictures/cmc_logo.jpg")), 
                                                 (140 * self.app.scale[0], 140 * self.app.scale[1])),
-                         pygame.transform.scale(pygame.image.load("msu_logo.jpg"), 
+                         pygame.transform.scale(pygame.image.load(resource_path("pictures/msu_logo.jpg")), 
                                                 (150 * self.app.scale[0], 150 * self.app.scale[1])),
-                         pygame.transform.scale(pygame.image.load("andrei.jpg"), 
+                         pygame.transform.scale(pygame.image.load(resource_path("pictures/andrei.jpg")), 
                                                 (400 * self.app.scale[0], 400 * self.app.scale[1])),
-                         pygame.transform.scale(pygame.image.load("eric.jpg"), 
+                         pygame.transform.scale(pygame.image.load(resource_path("pictures/eric.jpg")), 
                                                 (400 * self.app.scale[0], 400 * self.app.scale[1]))]
         
         self.pictures_positions = [(1600 * self.app.scale[0], 80 * self.app.scale[1]), 

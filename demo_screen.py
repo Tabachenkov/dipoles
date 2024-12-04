@@ -40,7 +40,7 @@ class DemoScreen():
 
         self.dipole_colors = [Color.GOLD, Color.GREEN]
         self.plot_colors = ['gold', 'green', 'purple', 'brown']
-        self.particle_color = Color.BLACK
+        self.particle_color = Color.DARK_GRAY
         self.dt = 0.0001
         self.radius = 1.0
         self.width = 1500
@@ -55,11 +55,11 @@ class DemoScreen():
         pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width * self.scale[0], self.height * self.scale[1]), 1)
 
         self.mode = NOT_STARTED
-        self.slider = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(50 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=0, max=2000, initial=0, step=1)
+        self.slider = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(50 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=0, max=1000, initial=0, step=1)
         self.textbox = TextBox(self.screen, int(1700 * self.scale[0]), int(70 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
         self.particles_number = 1000
         self.speed = 500
-        self.slider_s = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(150 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=100000, initial=50000, step=1)
+        self.slider_s = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(150 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1000, max=100000, initial=50000, step=1)
         self.textbox_s = TextBox(self.screen, int(1700 * self.scale[0]), int(170 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
         self.slider_radius = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(350 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=10, initial=1, step=1)
         self.textbox_radius = TextBox(self.screen, int(1700 * self.scale[0]), int(370 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
@@ -120,7 +120,7 @@ class DemoScreen():
         self.slider_charge.listen(events)
         self.slider_charge_mass.listen(events)
         self.slider_m.listen(events)
-
+    
         self.textbox.listen(events)
         self.textbox_s.listen(events)
         self.textbox_radius.listen(events)
@@ -161,6 +161,7 @@ class DemoScreen():
     def _update_screen(self):
         self.screen.fill(self.bg_color)
         self.strings_surfaces = []
+        '''
         try:
             for i in range(2):
                 if len(self.data[i]) > 0:
@@ -179,7 +180,8 @@ class DemoScreen():
                 self.strings[-3 + 2 * i] = f"Стандарт. отклон. кин. энергии {i + 1} диполя: 0"
                 self.eng_strings[-4 + 2 * i] = f"Average kin. energy of {i + 1} dipole: 0"
                 self.eng_strings[-3 + 2 * i] = f"Standard dev. of {i + 1} dipole: 0"
-        for index, string in enumerate(self.strings if self.app.russian else self.eng_strings):
+        '''
+        for index, string in enumerate(self.strings[:-4] if self.app.russian else self.eng_strings[:-4]):
             self.strings_surfaces.append(self.little_font.render(string, False, (0, 0, 0)))
         for index, surface in enumerate(self.strings_surfaces):
             self.screen.blit(surface, np.array(self.positions[index] if self.app.russian else self.eng_positions[index]) * np.array(self.scale))
@@ -371,9 +373,9 @@ class DemoScreen():
                     self.app.active_screen = self.app.menu_screen
                 elif button.msg == 'Начать' or button.msg == 'Start':
                     self.mode = ACTIVATED
-                    self.particle_system = ParticleSystem(self.particles_number, self.radius, max_width=self.width, max_height=self.height, 
-                                                          avg_vel=self.speed, d_radius=self.d_radius, r=self.r / 2, charge=self.charge, 
-                                                          charge_mass=self.charge_mass, m=self.m)
+                    self.particle_system = ParticleSystem(self.particles_number, float(self.radius), max_width=self.width, max_height=self.height, 
+                                                          avg_vel=float(self.speed), d_radius=float(self.d_radius), r=self.r / 2, charge=float(self.charge), 
+                                                          charge_mass=float(self.charge_mass), m=float(self.m))
                     self.times = [0]
                     self.data = [[0], [0], [0], [0]]
                     self.has_data = False

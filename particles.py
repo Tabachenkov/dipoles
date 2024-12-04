@@ -64,6 +64,7 @@ class ParticleSystem:
     dw = [0, 0]
 
     def __post_init__(self) -> None:
+        # print(self.radius, self.d_radius)
         x_space = np.linspace(self.radius, self.max_width - self.radius, int(self.max_width // (2.5 * self.radius)))
         y_space = np.linspace(self.radius, self.max_height - self.radius, int(self.max_height // (2.5 * self.radius)))
         
@@ -372,15 +373,18 @@ class ParticleSystem:
                 charge = np.array([pos[0], pos[1], vel[0], vel[1]])
                 arr = self.entities
                 mask = (arr[:, 0] - charge[0]) ** 2 + (arr[:, 1] - charge[1]) ** 2 < ((self.radius + self.d_radius)** 2)
-                mask = mask & (((arr[:, 0] - charge[0]) ** 2 + (arr[:, 1] - charge[1]) ** 2) != 0)
+                # mask = mask & (((arr[:, 0] - charge[0]) ** 2 + (arr[:, 1] - charge[1]) ** 2) != 0)
                 if len(arr[mask]) > 0:
                     old_vx = charge[2]
                     old_vy = charge[3]
                     old_v = np.array([old_vx, old_vy])
                     old_r = charge[0:2]
                     
-                    r_diff = arr[mask, 0:2] - old_r
+                    r_diff = arr[:, 0:2] - old_r
                     r_mag2 = r_diff[:, 0] ** 2 + r_diff[:, 1] ** 2
+                    mask = mask & (np.sum((self.m * arr[:,2:4] - self.charge_mass * old_v) * r_diff, axis=1) < 0)
+                    r_diff = r_diff[mask,:]
+                    r_mag2 = r_mag2[mask]
 
                     scalar_dot = np.sum((self.m * arr[mask, 2:4] - self.charge_mass * old_v) * r_diff, axis=1) / r_mag2
                     temp = r_diff.copy()
@@ -397,9 +401,29 @@ class ParticleSystem:
             for i in range(self.count):
                 arr = self.entities[i+1:]
                 mask = (arr[:, 0] - self.entities[i, 0]) ** 2 + (arr[:, 1] - self.entities[i, 1]) ** 2 < ((2 * self.radius) ** 2)
-                mask = mask & (((arr[:, 0] - self.entities[i, 0]) ** 2 + (arr[:, 1] - self.entities[i, 1]) ** 2) != 0)
+                # mask = mask & (((arr[:, 0] - self.entities[i, 0]) ** 2 + (arr[:, 1] - self.entities[i, 1]) ** 2) != 0)
                 if len(arr[mask]) == 0:
                     continue
+                
+                old_vx = self.entities[i, 2]
+                old_vy = self.entities[i, 3]
+                old_v = np.array([old_vx, old_vy])
+                old_r = self.entities[i, 0:2]
+
+                r_diff = arr[:, 0:2] - old_r
+                r_mag2 = r_diff[:, 0] ** 2 + r_diff[:, 1] ** 2
+                mask = mask & (np.sum((arr[:,2:4] - old_v) * r_diff, axis=1) < 0)
+                r_diff = r_diff[mask,:]
+                r_mag2 = r_mag2[mask]
+                
+                scalar_dot = np.sum((arr[mask, 2:4] - old_v) * r_diff, axis=1) / r_mag2
+                temp = r_diff.copy()
+                temp[:, 0] *= scalar_dot
+                temp[:, 1] *= scalar_dot
+                arr[mask, 2:4] -= temp
+                self.entities[i, 2:4] += np.sum(temp, axis=0)
+                
+                '''
                 old_vx = self.entities[i, 2]
                 old_vy = self.entities[i, 3]
                 old_v = np.array([old_vx, old_vy])
@@ -407,13 +431,21 @@ class ParticleSystem:
 
                 r_diff = arr[mask, 0:2] - old_r
                 r_mag2 = r_diff[:, 0] ** 2 + r_diff[:, 1] ** 2
+                r_mag = np.sqrt(r_mag2)
+                normal = r_diff / r_mag[:, np.newaxis]
 
-                scalar_dot = np.sum((arr[mask, 2:4] - old_v) * r_diff, axis=1) / r_mag2
-                temp = r_diff.copy()
-                temp[:, 0] *= scalar_dot
-                temp[:, 1] *= scalar_dot
-                arr[mask, 2:4] -= temp
-                self.entities[i, 2:4] += np.sum(temp, axis=0)
+                v_rel = arr[mask, 2:4] - old_v
+                v_normal = np.sum(v_rel * normal, axis=1)
+
+                # Elastic collision response
+                v_normal_new = -v_normal
+                v_tangent = v_rel - v_normal[:, np.newaxis] * normal
+
+                new_v = v_normal_new[:, np.newaxis] * normal + v_tangent
+
+                arr[mask, 2:4] -= new_v
+                self.entities[i, 2:4] += np.sum(new_v, axis=0)
+                '''
         for i in range(2):
             self.dipoles[i].pos += self.dv[i] * dt
             self.dipoles[i].actangle += self.dw[i] * dt

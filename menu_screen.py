@@ -32,14 +32,14 @@ class MenuScreen():
         self.demonstration_label = "Компьютерная демонстрация по курсу"
         self.subject_name = "Статистическая физика"
         self.demonstration_name = "Взаимодействие диполей"
-        self.demonstration_name_2 = "в идеальном газе"
+        self.demonstration_name_2 = "в окружении идеального газа"
         self.strings = [self.msu_name, self.faculty_name, self.demonstration_label, self.subject_name,
                         self.demonstration_name, self.demonstration_name_2]
         self.eng_strings = ["Lomonosov Moscow State University", "Faculty of Computational Mathematics and Cybernetics",
                             "Computer demonstration of the course", "Statistical physics", "Dipoles' interaction",
-                            "in the ideal gas"]
-        self.positions = [(400, 100), (500, 150), (700, 250), (800, 300), (730, 400), (810, 470)]
-        self.eng_positions = [(650, 100), (500, 150), (700, 250), (830, 300), (790, 400), (830, 470)]
+                            "in an ideal gas environment"]
+        self.positions = [(400, 100), (500, 150), (700, 250), (800, 300), (730, 400), (710, 470)]
+        self.eng_positions = [(650, 100), (500, 150), (700, 250), (830, 300), (790, 400), (730, 470)]
         self.cmc_logo = pygame.transform.scale(pygame.image.load(resource_path("pictures/cmc_logo.jpg")), np.array((140, 140)) * np.array(self.scale))
         self.msu_logo = pygame.transform.scale(pygame.image.load(resource_path("pictures/msu_logo.jpg")), np.array((150, 150)) * np.array(self.scale))
         self.buttons = [Button(app, "Демонстрация", (750, 600), (400, 80)), 

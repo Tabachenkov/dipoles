@@ -25,7 +25,7 @@ class DemoScreen():
         self.scale = app.scale
         self.bg_color = (255, 255, 255)
         self.font = 'corbel'
-        self.little_font = pygame.font.SysFont(self.font, int(30 * self.app.scale[1]))
+        self.little_font = pygame.font.SysFont(self.font, int(30 * self.app.scale[1]), bold=True)
         self.middle_font = pygame.font.SysFont(self.font, int(40 * self.app.scale[1]), bold=True)
         self.big_font = pygame.font.SysFont(self.font, int(50 * self.app.scale[1]))
         self.buttons = [Button(self.app, "Начать" if self.app.russian else "Start", (1000, 800), (250, 70), font_size=30),
@@ -55,27 +55,27 @@ class DemoScreen():
         pygame.draw.rect(self.screen, Color.BLACK.rgb, Rectangle(0, 0, self.width * self.scale[0], self.height * self.scale[1]), 1)
 
         self.mode = NOT_STARTED
-        self.slider = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(50 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=0, max=1000, initial=0, step=1)
+        self.slider = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(50 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=0, max=800, initial=200, step=1)
         self.textbox = TextBox(self.screen, int(1700 * self.scale[0]), int(70 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
         self.particles_number = 1000
         self.speed = 500
-        self.slider_s = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(150 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1000, max=100000, initial=50000, step=1)
-        self.textbox_s = TextBox(self.screen, int(1700 * self.scale[0]), int(170 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
-        self.slider_radius = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(350 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=10, initial=1, step=1)
+        self.slider_s = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(150 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1000, max=100000, initial=40000, step=1)
+        self.textbox_s = TextBox(self.screen, int(1700 * self.scale[0]), int(170 * self.scale[1]), int(70 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
+        self.slider_radius = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(350 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=8, initial=3, step=1)
         self.textbox_radius = TextBox(self.screen, int(1700 * self.scale[0]), int(370 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
-        self.slider_width = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(450 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=300, max=1500, initial=1500, step=100)
+        self.slider_width = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(450 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=300, max=1500, initial=700, step=100)
         self.textbox_width = TextBox(self.screen, int(1700 * self.scale[0]), int(470 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
         self.slider_height = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(550 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=300, max=500, initial=500, step=100)
         self.textbox_height = TextBox(self.screen, int(1700 * self.scale[0]), int(570 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
         self.slider_d_radius = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(650 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=15, initial=5, step=1)
         self.textbox_d_radius = TextBox(self.screen, int(1700 * self.scale[0]), int(670 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
-        self.slider_r = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(750 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=15 * 2, max=100 * 2, initial=15 * 2, step=2)
+        self.slider_r = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(750 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=15 * 2, max=100 * 2, initial=186, step=2)
         self.textbox_r = TextBox(self.screen, int(1700 * self.scale[0]), int(770 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
         self.slider_charge = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(850 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=0, max=10, initial=1, step=1)
         self.textbox_charge = TextBox(self.screen, int(1700 * self.scale[0]), int(870 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
         self.slider_charge_mass = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(950 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=50, initial=1, step=1)
         self.textbox_charge_mass = TextBox(self.screen, int(1700 * self.scale[0]), int(970 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
-        self.slider_m = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(250 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=50, initial=1, step=1)
+        self.slider_m = Slider(self.screen, x=int(1600 * self.scale[0]), y=int(250 * self.scale[1]), width=int(250 * self.scale[0]), height=int(10 * self.scale[1]), min=1, max=50, initial=10, step=1)
         self.textbox_m = TextBox(self.screen, int(1700 * self.scale[0]), int(270 * self.scale[1]), int(60 * self.scale[0]), int(30 * self.scale[1]), fontSize=20)
 
         self.strings = ["Количество частиц", "Средняя скорость частиц", "Масса частицы", 
@@ -88,7 +88,7 @@ class DemoScreen():
         "Charge mass",
         "Average kin. energy of 1 dipole: 0", "Standard dev. of 1 dipole: 0",
         "Average kin. energy of 2 dipole: 0", "Standard dev. of 2 dipole: 0"]
-        self.positions = [(1600, 20), (1600, 120), (1600, 220), (1600, 320), (1600, 420), (1600, 520), (1600, 620), (1600, 720), (1600, 820), (1600, 920), 
+        self.positions = [(1600, 20), (1600, 120), (1600, 220), (1600, 320), (1600, 420), (1600, 520), (1600, 620), (1550, 720), (1600, 820), (1600, 920), 
                           (1000, 660), (1000, 690), (1000, 720), (1000, 750)]
         self.eng_positions = [(1600, 20), (1600, 120), (1600, 220), (1600, 320), (1600, 420), (1600, 520), (1600, 620), (1600, 720), (1600, 820), (1600, 920),
                               (1000, 660), (1000, 690), (1000, 720), (1000, 750)]

@@ -81,17 +81,15 @@ class DemoScreen():
         self.strings = ["Количество частиц", "Средняя скорость частиц", "Масса частицы", 
         "Радиус частицы", "Ширина", "Высота", "Радиус заряда", "Расстояние между зарядами", "Величина заряда",
         "Масса заряда",
-        "Средняя кин. энергия 1 диполя: 0", "Стандартное отклонение кин. энергии 1 диполя",
-        "Средняя кин. энергия 2 диполя: 0", "Стандартное отклонение кин. энергии 2 диполя"]
+        "Полная энергия системы: 0"]
         self.eng_strings = ["Number of particles", "Average speed of particles", "Particle mass", 
         "Particle radius", "Width", "Height", "Charge radius", "Distance between charges", "Charge value",
         "Charge mass",
-        "Average kin. energy of 1 dipole: 0", "Standard dev. of 1 dipole: 0",
-        "Average kin. energy of 2 dipole: 0", "Standard dev. of 2 dipole: 0"]
+        "Full energy of system: 0"]
         self.positions = [(1600, 20), (1600, 120), (1600, 220), (1600, 320), (1600, 420), (1600, 520), (1600, 620), (1550, 720), (1600, 820), (1600, 920), 
-                          (1000, 660), (1000, 690), (1000, 720), (1000, 750)]
+                          (1000, 660)]
         self.eng_positions = [(1600, 20), (1600, 120), (1600, 220), (1600, 320), (1600, 420), (1600, 520), (1600, 620), (1600, 720), (1600, 820), (1600, 920),
-                              (1000, 660), (1000, 690), (1000, 720), (1000, 750)]
+                              (1000, 660)]
 
         self.times = [0]
         self.data = [[0], [0], [0], [0]]
@@ -161,27 +159,18 @@ class DemoScreen():
     def _update_screen(self):
         self.screen.fill(self.bg_color)
         self.strings_surfaces = []
-        '''
-        try:
-            for i in range(2):
-                if len(self.data[i]) > 0:
-                    self.strings[-4 + 2 * i] = f"Средняя кин. энергия {i + 1} диполя: " + f'{int(np.average(np.array(self.data[i])).item())}'
-                    self.strings[-3 + 2 * i] = f"Стандарт. отклон. кин. энергии {i + 1} диполя: " + f'{int(np.sqrt(np.var(np.array(self.data[i]))).item())}'
-                    self.eng_strings[-4 + 2 * i] = f"Average kin. energy of {i + 1} dipole: " + f'{int(np.average(np.array(self.data[i])).item())}'
-                    self.eng_strings[-3 + 2 * i] = f"Standard dev. of {i + 1} dipole: " + f'{int(np.sqrt(np.var(np.array(self.data[i]))).item())}'
-                else:
-                    self.strings[-4 + 2 * i] = f"Средняя кин. энергия {i + 1} диполя: 0"
-                    self.strings[-3 + 2 * i] = f"Стандарт. отклон. кин. энергии {i + 1} диполя: 0"
-                    self.eng_strings[-4 + 2 * i] = f"Average kin. energy of {i + 1} dipole: 0"
-                    self.eng_strings[-3 + 2 * i] = f"Standard dev. of {i + 1} dipole: 0"
-        except:
-            for i in range(2):
-                self.strings[-4 + 2 * i] = f"Средняя кин. энергия {i + 1} диполя: 0"
-                self.strings[-3 + 2 * i] = f"Стандарт. отклон. кин. энергии {i + 1} диполя: 0"
-                self.eng_strings[-4 + 2 * i] = f"Average kin. energy of {i + 1} dipole: 0"
-                self.eng_strings[-3 + 2 * i] = f"Standard dev. of {i + 1} dipole: 0"
-        '''
-        for index, string in enumerate(self.strings[:-4] if self.app.russian else self.eng_strings[:-4]):
+        if self.app.russian:
+            if self.data[-1][-1] != 0:
+                self.strings[-1] = f"Полная энергия системы:" + f'{self.data[-1][-1]:e}'
+            else:
+                self.strings[-1] = f"Полная энергия системы: 0"
+        else:
+            if self.data[-1][-1] != 0:
+                self.eng_strings[-1] = f"Full energy of system:" + f'{self.data[-1][-1]:e}'
+            else:
+                self.eng_strings[-1] = f"Full energy of system: 0"
+        
+        for index, string in enumerate(self.strings if self.app.russian else self.eng_strings):
             self.strings_surfaces.append(self.little_font.render(string, False, (0, 0, 0)))
         for index, surface in enumerate(self.strings_surfaces):
             self.screen.blit(surface, np.array(self.positions[index] if self.app.russian else self.eng_positions[index]) * np.array(self.scale))
@@ -210,7 +199,7 @@ class DemoScreen():
                 axes.plot(self.times, self.data[0], color=self.plot_colors[0])
                 axes.plot(self.times, self.data[1], color=self.plot_colors[1])
                 axes.plot(self.times, self.data[2], color=self.plot_colors[2])
-                axes.plot(self.times, self.data[3], color=self.plot_colors[3])
+                #axes.plot(self.times, self.data[3], color=self.plot_colors[3])
                 axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.", fontsize=15)
                 axes.set_title("Энергии диполей" if self.app.russian else "Dipoles' energies", fontsize=15)
                 axes.set_xlim(xmin=self.times[0])
@@ -270,7 +259,7 @@ class DemoScreen():
             axes.plot(self.times, self.data[0], color=self.plot_colors[0])
             axes.plot(self.times, self.data[1], color=self.plot_colors[1])
             axes.plot(self.times, self.data[2], color=self.plot_colors[2])
-            axes.plot(self.times, self.data[3], color=self.plot_colors[3])
+            #axes.plot(self.times, self.data[3], color=self.plot_colors[3])
             axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.", fontsize=15)
             axes.set_title("Энергии диполей" if self.app.russian else "Dipoles' energies", fontsize=15)
             axes.set_xlim(xmin=self.times[0])
@@ -327,7 +316,7 @@ class DemoScreen():
             axes.plot(self.times, self.data[0], color=self.plot_colors[0])
             axes.plot(self.times, self.data[1], color=self.plot_colors[1])
             axes.plot(self.times, self.data[2], color=self.plot_colors[2])
-            axes.plot(self.times, self.data[3], color=self.plot_colors[3])
+            #axes.plot(self.times, self.data[3], color=self.plot_colors[3])
             axes.set_xlabel("Время, сек." if self.app.russian else "Time, sec.", fontsize=15)
             axes.set_title("Энергии диполей" if self.app.russian else "Dipoles' energies", fontsize=15)
             axes.set_xlim(xmin=self.times[0])
